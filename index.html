@@ -28,7 +28,6 @@
       overflow-x: hidden;
     }
 
-    /* ── HERO ── */
     .hero {
       position: relative;
       height: 100vh;
@@ -49,7 +48,6 @@
       z-index: 0;
     }
 
-    /* dark overlay so text pops */
     .hero-bg::after {
       content: '';
       position: absolute;
@@ -62,7 +60,6 @@
       );
     }
 
-    /* ── NAV ── */
     nav {
       position: relative;
       z-index: 10;
@@ -89,7 +86,6 @@
       color: rgba(255,255,255,0.45);
     }
 
-    /* ── HERO CONTENT ── */
     .hero-content {
       position: relative;
       z-index: 10;
@@ -135,7 +131,6 @@
       animation: fadeUp 0.7s ease forwards 0.6s;
     }
 
-    /* ── EMAIL FORM ── */
     .signup-form {
       display: flex;
       gap: 0;
@@ -192,7 +187,6 @@
       animation: fadeUp 0.7s ease forwards 1s;
     }
 
-    /* ── SECTION 2 ── */
     .section-2 {
       background: var(--off-white);
       color: var(--dark);
@@ -266,7 +260,6 @@
       margin: 0;
     }
 
-    /* ── FOOTER ── */
     footer {
       background: var(--dark);
       padding: 2.5rem 3rem;
@@ -291,13 +284,11 @@
       color: rgba(255,255,255,0.3);
     }
 
-    /* ── ANIMATIONS ── */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── THANK YOU STATE ── */
     .thankyou {
       display: none;
       font-size: 0.9rem;
@@ -306,7 +297,6 @@
       padding: 0.95rem 0;
     }
 
-    /* ── MOBILE ── */
     @media (max-width: 600px) {
       nav { padding: 1.5rem 1.5rem; }
       .hero-content { padding: 0 1.5rem 3rem; }
@@ -331,7 +321,6 @@
 </head>
 <body>
 
-  <!-- HERO -->
   <section class="hero">
     <div class="hero-bg"></div>
 
@@ -345,8 +334,8 @@
       <h1>You just got<br>the <em>call.</em><br>Now what?</h1>
       <p class="hero-sub">Landed helps you go from blindsided to back on track. No fluff, no generic advice — just a real plan built around your situation.</p>
 
-      <form class="signup-form" onsubmit="handleSubmit(event)">
-        <input type="email" id="emailInput" placeholder="Your email address" required />
+      <form class="signup-form" action="https://formspree.io/f/mpqnpywz" method="POST" onsubmit="handleSubmit(event)">
+        <input type="email" name="email" id="emailInput" placeholder="Your email address" required />
         <button type="submit">Get Early Access</button>
       </form>
       <p class="thankyou" id="thankyou">You're in. We'll reach out when Landed is ready. 🙌</p>
@@ -354,7 +343,6 @@
     </div>
   </section>
 
-  <!-- WHAT IS LANDED -->
   <section class="section-2">
     <div class="section-2-inner">
       <div class="section-label">What We Do</div>
@@ -381,7 +369,6 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer>
     <div class="footer-logo">L<span>A</span>NDED</div>
     <p>© 2026 Landed. All rights reserved.</p>
@@ -389,17 +376,26 @@
   </footer>
 
   <script>
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
       e.preventDefault();
-      const email = document.getElementById('emailInput').value;
-      // Store in localStorage for now — wire up to backend later
-      const existing = JSON.parse(localStorage.getItem('landed_signups') || '[]');
-      existing.push({ email, date: new Date().toISOString() });
-      localStorage.setItem('landed_signups', JSON.stringify(existing));
+      const form = e.target;
+      const data = new FormData(form);
 
-      document.querySelector('.signup-form').style.display = 'none';
-      document.querySelector('.form-note').style.display = 'none';
-      document.getElementById('thankyou').style.display = 'block';
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: data,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+          document.querySelector('.signup-form').style.display = 'none';
+          document.querySelector('.form-note').style.display = 'none';
+          document.getElementById('thankyou').style.display = 'block';
+        }
+      } catch (err) {
+        console.error(err);
+      }
     }
   </script>
 
