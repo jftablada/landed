@@ -348,7 +348,7 @@
         <button type="submit">Get Early Access</button>
       </form>
       <p class="thankyou" id="thankyou">You're in. We'll reach out when Landed is ready. 🙌</p>
-      <p class="form-note">Receive an update when we launch</p>
+      <p class="form-note">Receive an update when we launch.</p>
     </div>
   </section>
 
@@ -378,13 +378,96 @@
     </div>
   </section>
 
+  <!-- FOOTER -->
   <footer>
     <div class="footer-logo">L<span>A</span>NDED</div>
     <p>© 2026 Landed. All rights reserved.</p>
-    <p>Not professional career counseling. A tool to help you think.</p>
+    <div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center;">
+      <p>Not professional career counseling. A tool to help you think.</p>
+      <p><a href="#" onclick="openLegal('terms');return false;" style="color:rgba(255,255,255,0.4);text-decoration:underline;cursor:pointer;">Terms of Service</a></p>
+      <p><a href="#" onclick="openLegal('privacy');return false;" style="color:rgba(255,255,255,0.4);text-decoration:underline;cursor:pointer;">Privacy Policy</a></p>
+    </div>
   </footer>
 
+  <!-- LEGAL MODAL -->
+  <div id="legalModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:1000;overflow-y:auto;padding:2rem 1rem;">
+    <div style="max-width:720px;margin:2rem auto;background:#1a1a1a;border-radius:12px;padding:3rem 2.5rem;position:relative;">
+      <button onclick="closeLegal()" style="position:absolute;top:1.5rem;right:1.5rem;background:none;border:1px solid rgba(255,255,255,0.2);color:white;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;line-height:1;">✕</button>
+      <div id="legalContent" style="font-family:'DM Sans',sans-serif;color:rgba(255,255,255,0.8);font-size:0.9rem;line-height:1.75;"></div>
+    </div>
+  </div>
+
   <script>
+    const termsContent = `
+      <h2 style="font-size:2rem;font-family:'Bebas Neue',sans-serif;color:#1D9E75;margin-bottom:0.25rem;">Terms of Service</h2>
+      <p style="font-size:0.75rem;color:rgba(255,255,255,0.3);margin-bottom:2rem;">Last updated: May 2026</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">1. Acceptance of Terms</h3>
+      <p>By accessing or using the Landed website at getlanded.ca, you agree to be bound by these Terms of Service. If you do not agree, please do not use the Site. Landed is operated as a sole proprietorship based in Toronto, Ontario, Canada.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">2. Description of Service</h3>
+      <p>Landed is a career recovery platform currently in development. The Site is in a pre-launch phase and is collecting email addresses from individuals interested in receiving updates about the platform's launch. No products or services are currently being sold or delivered.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">3. Email Collection</h3>
+      <p>By submitting your email address, you consent to receiving updates and launch announcements from Landed. You may unsubscribe at any time by contacting us at getlandedca@gmail.com.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">4. Not Professional Advice</h3>
+      <p>Landed is not a licensed career counseling service. Any content or guidance provided is for informational purposes only and does not constitute professional career, legal, financial, or psychological advice.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">5. Intellectual Property</h3>
+      <p>All content on this Site is the property of Landed and is protected under applicable Canadian and international intellectual property laws. You may not reproduce or use any content without prior written permission.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">6. Limitation of Liability</h3>
+      <p>To the fullest extent permitted by law, Landed shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Site. Your use is at your own risk.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">7. Governing Law</h3>
+      <p>These Terms are governed by the laws of the Province of Ontario and the federal laws of Canada. Disputes shall be subject to the exclusive jurisdiction of the courts of Ontario.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">8. Contact</h3>
+      <p>Questions? Email us at <a href="mailto:getlandedca@gmail.com" style="color:#1D9E75;">getlandedca@gmail.com</a></p>
+    `;
+
+    const privacyContent = `
+      <h2 style="font-size:2rem;font-family:'Bebas Neue',sans-serif;color:#1D9E75;margin-bottom:0.25rem;">Privacy Policy</h2>
+      <p style="font-size:0.75rem;color:rgba(255,255,255,0.3);margin-bottom:2rem;">Last updated: May 2026</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">1. Overview</h3>
+      <p>Landed is committed to protecting your personal information. We comply with the Personal Information Protection and Electronic Documents Act (PIPEDA) and applicable Ontario privacy legislation.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">2. Information We Collect</h3>
+      <p>We collect only your email address when you voluntarily submit it through our early access form. We do not collect your name, phone number, payment information, or any other personal data at this time.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">3. How We Use Your Information</h3>
+      <p>Your email is used solely to send you updates about the Landed platform. We will not use it for any other purpose without your explicit consent.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">4. Data Sharing</h3>
+      <p>We do not sell or share your personal information. We use Formspree (formspree.io) to process form submissions. You can review their privacy policy at formspree.io/legal/privacy-policy.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">5. Your Rights</h3>
+      <p>Under PIPEDA, you have the right to access, correct, or request deletion of your personal information. To exercise these rights, contact us at <a href="mailto:getlandedca@gmail.com" style="color:#1D9E75;">getlandedca@gmail.com</a>.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">6. Cookies & Analytics</h3>
+      <p>We use Google Analytics (GA4) to understand how visitors interact with our Site. GA4 may use cookies to collect anonymized usage data. You can opt out via tools.google.com/dlpage/gaoptout.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">7. Contact</h3>
+      <p>Privacy questions? Email us at <a href="mailto:getlandedca@gmail.com" style="color:#1D9E75;">getlandedca@gmail.com</a></p>
+    `;
+
+    function openLegal(type) {
+      document.getElementById('legalContent').innerHTML = type === 'terms' ? termsContent : privacyContent;
+      document.getElementById('legalModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLegal() {
+      document.getElementById('legalModal').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('legalModal').addEventListener('click', function(e) {
+      if (e.target === this) closeLegal();
+    });
+
     async function handleSubmit(e) {
       e.preventDefault();
       const form = e.target;
