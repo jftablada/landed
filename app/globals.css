@@ -1,26 +1,46 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────────────
+   Landed brand tokens (V1)
+
+   Dark, calm, recovery-focused. Green (#1D9E75) is for trust and brand —
+   NOT for scoring the user's situation. Mode states stay tonally neutral.
+   ───────────────────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --canvas: #0b0c0d;        /* near-black page background */
+  --surface: #15171a;       /* lifted card / section background */
+  --surface-2: #1d2024;     /* hover / nested surface */
+  --border: #2a2e33;        /* hairline borders */
+  --text: #ededed;          /* primary text */
+  --text-muted: #9aa0a6;    /* secondary text */
+  --brand: #1d9e75;         /* Landed green — accent only */
+  --brand-soft: #14543f;    /* muted green for subtle fills */
 }
 
+/* Wire tokens into Tailwind v4 so utilities like bg-canvas, text-brand,
+   text-muted, border-hair, font-display all work. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-hair: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-sans);        /* DM Sans (from layout) */
+  --font-display: var(--font-display);  /* Bebas Neue (from layout) */
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--canvas);
+  color: var(--text);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Bebas Neue is all-caps and tall; give display headings breathing room. */
+.font-display {
+  font-family: var(--font-display), Arial, sans-serif;
+  letter-spacing: 0.02em;
 }

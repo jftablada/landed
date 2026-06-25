@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LHNE955N8N"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-LHNE955N8N');
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Landed — You just got the call. Now what?</title>
+  <meta name="description" content="Landed is a 90-day career recovery system for people who were laid off, had a contract end, or need a real plan. Not a job board. A sequence that works." />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #1D9E75;
+      --green-light: #24b888;
+      --white: #ffffff;
+      --off-white: #f0ede8;
+      --dark: #0f0f0f;
+      --mid: #1a1a1a;
+      --gold: #C8962A;
+      --gold-light: #D4A84B;
+      --surface: #161A24;
+      --muted: rgba(255,255,255,0.45);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--dark);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ─── HERO ─── */
+
+    .hero {
+      position: relative;
+      height: 100vh;
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('bg.png');
+      background-size: cover;
+      background-position: center right;
+      background-attachment: scroll;
+      z-index: 0;
+    }
+
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        105deg,
+        rgba(10,10,10,0.88) 0%,
+        rgba(10,10,10,0.60) 55%,
+        rgba(10,10,10,0.25) 100%
+      );
+    }
+
+    /* ─── NAV ─── */
+
+    nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 3rem;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.12em;
+      color: var(--white);
+    }
+
+    .logo span { color: var(--green); }
+
+    /* Nav CTA — hidden until hero form exits viewport */
+    .nav-cta {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 300ms ease;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--dark);
+      background: var(--green);
+      padding: 0.55rem 1.1rem;
+      border-radius: 4px;
+      text-decoration: none;
+      white-space: nowrap;
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .nav-cta:hover { background: var(--green-light); }
+
+    /* ─── HERO CONTENT ─── */
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      padding: 0 3rem 4rem;
+      max-width: 780px;
+    }
+
+    .coming-soon-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.45);
+      font-size: 0.68rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      padding: 4px 12px;
+      border-radius: 2px;
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.1s;
+    }
+
+    .category-line {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1.2rem;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.2s;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.8rem, 9vw, 7.5rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      color: var(--white);
+      margin-bottom: 1.8rem;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.4s;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--green);
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 1.8vw, 1.15rem);
+      font-weight: 300;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.72);
+      max-width: 620px;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.6s;
+    }
+
+    .form-wrap {
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.8s;
+    }
+
+    .form-label-text {
+      display: block;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
+    }
+
+    .signup-form {
+      display: flex;
+      gap: 0;
+      max-width: 440px;
+    }
+
+    .signup-form input {
+      flex: 1;
+      padding: 0.95rem 1.3rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-right: none;
+      border-radius: 6px 0 0 6px;
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      backdrop-filter: blur(8px);
+    }
+
+    .signup-form input::placeholder { color: rgba(255,255,255,0.35); }
+    .signup-form input:focus {
+      border-color: var(--green);
+      background: rgba(255,255,255,0.12);
+    }
+
+    .signup-form button {
+      padding: 0.95rem 1.6rem;
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 0 6px 6px 0;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, transform 0.15s;
+      min-height: 44px;
+    }
+
+    .signup-form button:hover { background: var(--green-light); }
+    .signup-form button:active { transform: scale(0.98); }
+    .signup-form button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .signup-form button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+    .form-micro {
+      margin-top: 0.65rem;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.02em;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 1s;
+    }
+
+    .thankyou {
+      display: none;
+      font-size: 0.9rem;
+      color: var(--green);
+      font-weight: 500;
+      padding: 0.95rem 0;
+      max-width: 440px;
+    }
+
+    /* ─── SECTION SHARED ─── */
+
+    .section-pad {
+      padding: 80px 3rem;
+    }
+
+    .section-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-inner-narrow {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .section-inner-wide {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1rem;
+    }
+
+    /* ─── PROBLEM SECTION ─── */
+
+    .section-problem {
+      background: var(--dark);
+      padding: 80px 3rem;
+    }
+
+    .section-problem h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: 0.03em;
+      color: var(--white);
+      margin-bottom: 1.8rem;
+    }
+
+    .section-problem p {
+      font-size: 1rem;
+      font-weight: 300;
+      line-height: 1.75;
+      color: rgba(255,255,255,0.55);
+      max-width: 580px;
+      margin-bottom: 1rem;
+    }
+
+    .section-problem p:last-child { margin-bottom: 0; }
+
+    /* ─── WHAT LANDED IS (section-2) ─── */
+
+    .section-2 {
+      background: var(--off-white);
+      color: var(--dark);
+      padding: 6rem 3rem;
+    }
+
+    .section-2-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-2 h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      line-height: 1;
+      letter-spacing: 0.03em;
+      color: var(--dark);
+      margin-bottom: 1.5rem;
+    }
+
+    .section-2 > .section-2-inner > p {
+      font-size: 1.05rem;
+      font-weight: 300;
+      line-height: 1.75;
+      color: #444;
+      max-width: 560px;
+      margin-bottom: 3.5rem;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2rem;
+    }
+
+    .feature {
+      padding: 1.8rem;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 10px;
+      background: white;
+    }
+
+    .feature-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      color: var(--green);
+      line-height: 1;
+      margin-bottom: 0.6rem;
+    }
+
+    .feature h3 {
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      color: var(--dark);
+    }
+
+    .feature p {
+      font-size: 0.875rem;
+      color: #555;
+      line-height: 1.7;
+      margin: 0 0 0.75rem;
+    }
+
+    .feature p:last-child { margin-bottom: 0; }
+
+    .audience-note {
+      font-size: 0.8rem;
+      font-style: italic;
+      color: #888;
+      margin-top: 0.5rem;
+    }
+
+    /* ─── TRUST SECTION ─── */
+
+    .section-trust {
+      background: var(--dark);
+      padding: 80px 3rem;
+    }
+
+    .section-trust h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: 0.03em;
+      color: var(--white);
+      margin-bottom: 2.5rem;
+    }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    .trust-card {
+      background: #161A24;
+      border-left: 4px solid var(--green);
+      padding: 1.75rem 1.5rem;
+      border-radius: 2px;
+    }
+
+    .trust-card-label {
+      font-size: 0.68rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--green);
+      margin-bottom: 0.65rem;
+    }
+
+    .trust-card p {
+      font-size: 0.925rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.7;
+    }
+
+    /* ─── FINAL CTA SECTION ─── */
+
+    .section-final-cta {
+      background: #161A24;
+      padding: 80px 3rem;
+      text-align: center;
+    }
+
+    .section-final-cta h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+      line-height: 1.05;
+      letter-spacing: 0.03em;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+
+    .section-final-cta .cta-sub {
+      font-size: 1rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.55);
+      max-width: 520px;
+      margin: 0 auto 2rem;
+    }
+
+    .final-form-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .final-form-label {
+      display: block;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
+      text-align: left;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .final-signup-form {
+      display: flex;
+      gap: 0;
+      max-width: 440px;
+      width: 100%;
+    }
+
+    .final-signup-form input {
+      flex: 1;
+      padding: 0.95rem 1.3rem;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-right: none;
+      border-radius: 6px 0 0 6px;
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .final-signup-form input::placeholder { color: rgba(255,255,255,0.3); }
+    .final-signup-form input:focus {
+      border-color: var(--green);
+      background: rgba(255,255,255,0.1);
+    }
+
+    .final-signup-form button {
+      padding: 0.95rem 1.6rem;
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 0 6px 6px 0;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, transform 0.15s;
+      min-height: 44px;
+    }
+
+    .final-signup-form button:hover { background: var(--green-light); }
+    .final-signup-form button:active { transform: scale(0.98); }
+    .final-signup-form button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .final-signup-form button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+    .final-micro {
+      margin-top: 0.65rem;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.02em;
+    }
+
+    .thankyou-final {
+      display: none;
+      font-size: 0.9rem;
+      color: var(--green);
+      font-weight: 500;
+      padding: 0.95rem 0;
+      max-width: 440px;
+      text-align: center;
+    }
+
+    /* ─── FOOTER ─── */
+
+    footer {
+      background: var(--dark);
+      padding: 2.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.12em;
+      color: var(--white);
+    }
+
+    .footer-logo span { color: var(--green); }
+
+    .footer-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      text-align: center;
+    }
+
+    .footer-tagline {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.35);
+      font-weight: 300;
+    }
+
+    footer p {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ─── ANIMATIONS ─── */
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 400ms ease, transform 400ms ease;
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── MOBILE ─── */
+
+    @media (max-width: 768px) {
+      .section-trust .trust-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .trust-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .section-pad { padding: 100px 3rem; }
+      .section-problem { padding: 100px 3rem; }
+      .section-trust { padding: 100px 3rem; }
+      .section-final-cta { padding: 100px 3rem; }
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 1.5rem 1.5rem; }
+
+      .hero-content { padding: 0 1.5rem 3rem; }
+
+      .section-2 { padding: 4rem 1.5rem; }
+      .section-problem { padding: 60px 1.5rem; }
+      .section-trust { padding: 60px 1.5rem; }
+      .section-final-cta { padding: 60px 1.5rem; }
+
+      footer {
+        padding: 2rem 1.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .footer-center { align-items: flex-start; text-align: left; }
+
+      /* Hero form — stack on mobile */
+      .signup-form {
+        flex-direction: column;
+        gap: 0.75rem;
+        max-width: 100%;
+      }
+      .signup-form input {
+        border-right: 1px solid rgba(255,255,255,0.18);
+        border-radius: 6px;
+        width: 100%;
+      }
+      .signup-form input:focus { border-color: var(--green); }
+      .signup-form button {
+        border-radius: 6px;
+        text-align: center;
+        width: 100%;
+        min-height: 52px;
+      }
+
+      /* Final form — stack on mobile */
+      .final-signup-form {
+        flex-direction: column;
+        gap: 0.75rem;
+        max-width: 100%;
+      }
+      .final-signup-form input {
+        border-right: 1px solid rgba(255,255,255,0.15);
+        border-radius: 6px;
+        width: 100%;
+      }
+      .final-signup-form input:focus { border-color: var(--green); }
+      .final-signup-form button {
+        border-radius: 6px;
+        text-align: center;
+        width: 100%;
+        min-height: 52px;
+      }
+
+      .final-form-label { max-width: 100%; }
+      .final-signup-form { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+
+    <nav>
+      <div class="logo">L<span>A</span>NDED</div>
+      <a href="#final-cta" class="nav-cta" id="navCTA" aria-label="Get early access to Landed">Get Early Access →</a>
+    </nav>
+
+    <div class="hero-content">
+      <div class="coming-soon-badge">Coming Soon</div>
+      <div class="category-line">A recovery system for people who didn't see it coming</div>
+      <h1>You just got<br>the <em>call.</em><br>Now what?</h1>
+      <p class="hero-sub">A step-by-step plan for the first 30 days after a layoff, a contract ending, or a sudden career change. Not inspiration. A real plan, in the right order.</p>
+
+      <div class="form-wrap">
+        <label class="form-label-text" for="emailInputHero">Your email address</label>
+        <form class="signup-form" id="heroForm" action="https://formspree.io/f/mpqnpywz" method="POST">
+          <input type="email" name="email" id="emailInputHero" placeholder="Email" autocomplete="email" required />
+          <button type="submit">Get Early Access</button>
+        </form>
+        <p class="form-micro">Free to join - One email when your spot is ready</p>
+      </div>
+      <p class="thankyou" id="thankyouHero">You're on the list. When Landed is ready, you'll get first access — and your first step.</p>
+    </div>
+  </section>
+
+  <!-- ─── PROBLEM SECTION (new) ─── -->
+  <section class="section-problem fade-up" id="problem">
+    <div class="section-inner-narrow">
+      <div class="eyebrow">What this moment actually looks like</div>
+      <h2>The first week is the hardest part. Nobody hands you a script.</h2>
+      <p>You're checking your bank account. Wondering who to tell and when. Opening LinkedIn and closing it again.</p>
+      <p>The advice you find is either too vague to act on or too aggressive to stomach.</p>
+      <p>Landed is built for that gap — between "I just got the news" and "I know exactly what to do."</p>
+    </div>
+  </section>
+
+  <!-- ─── WHAT LANDED IS ─── -->
+  <section class="section-2">
+    <div class="section-2-inner">
+      <div class="section-label">What this is</div>
+      <h2>Built for the moment<br>everything changes.</h2>
+      <p>Whether your contract just ended or you got laid off — Landed gives you a clear path forward. Not a job board. Not generic career advice. A real plan for right now, built around your situation.</p>
+
+      <div class="features">
+
+        <div class="feature fade-up">
+          <div class="feature-num">01</div>
+          <h3>Recovery Roadmap</h3>
+          <p>You don't know where to start. That's not a character flaw. That's the situation.</p>
+          <p>Tell us what happened. Landed builds a step-by-step plan for your first 30 days — prioritized by what actually matters first, not what feels most urgent.</p>
+          <p>Financial stabilization. Target clarity. Outreach sequence. In the right order.</p>
+          <p class="audience-note">For people in the first week after a layoff or contract ending.</p>
+        </div>
+
+        <div class="feature fade-up">
+          <div class="feature-num">02</div>
+          <h3>Interview Prep</h3>
+          <p>Most interview prep is built around generic advice. This is built around the specific job you're applying for.</p>
+          <p>Paste any job description. Get the likely questions and how to answer them — in your voice, not a coached version of it.</p>
+          <p class="audience-note">For people who have interviews lined up and want to actually be ready.</p>
+        </div>
+
+        <div class="feature fade-up">
+          <div class="feature-num">03</div>
+          <h3>Contractor Playbook</h3>
+          <p>Contract work ends differently than employment. No severance meeting. No warning. Just a renewal date approaching and a lot of uncertainty.</p>
+          <p>The Contractor Playbook shows you how to open the conversion conversation before the window closes — and what to do if it doesn't go the way you hoped.</p>
+          <p class="audience-note">For contractors and freelancers facing a non-renewal.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TRUST SECTION (new) ─── -->
+  <section class="section-trust fade-up" id="trust">
+    <div class="section-inner-wide">
+      <div class="eyebrow">Who this is being built for</div>
+      <h2>We're in early access. Here's what we know so far.</h2>
+      <div class="trust-grid">
+
+        <div class="trust-card">
+          <div class="trust-card-label">Built around one insight</div>
+          <p>People don’t fail their recovery because they lack motivation. They fail because the process feels overwhelming and unclear. Landed helps create a clear path forward.</p>
+        </div>
+
+        <div class="trust-card">
+          <div class="trust-card-label">Tested with real situations</div>
+          <p>The Recovery Roadmap, Interview Prep, and Contractor Playbook were shaped by working through the process with people in actual career transitions — not hypothetical scenarios.</p>
+        </div>
+
+        <div class="trust-card">
+          <div class="trust-card-label">Priced for the moment you're in</div>
+          <p>A flat-price 90-day system. Not a monthly subscription during the months you can least afford it. Early access members will be first to see the founding offer.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FINAL CTA (new) ─── -->
+  <section class="section-final-cta fade-up" id="final-cta">
+    <div class="section-inner">
+      <h2>Your next move takes 30 seconds.</h2>
+      <p class="cta-sub">Join the waitlist. When Landed launches, you'll get first access — plus your first step.</p>
+
+      <div class="final-form-wrap">
+        <label class="final-form-label" for="emailInputFinal">Your email address</label>
+        <form class="final-signup-form" id="finalForm" action="https://formspree.io/f/mpqnpywz" method="POST">
+          <input type="email" name="email" id="emailInputFinal" placeholder="Email" autocomplete="email" required />
+          <button type="submit">Get Early Access</button>
+        </form>
+        <p class="final-micro">Free to join - One email when your spot is ready</p>
+      </div>
+      <p class="thankyou-final" id="thankyouFinal">You're on the list. When Landed is ready, you'll get first access — and your first step.</p>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+<footer>
+    <div class="footer-logo">L<span>A</span>NDED</div>
+    <p>© 2026 Landed. All rights reserved.</p>
+    <div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center;">
+      <p>Not professional career counseling. A tool to help you think.</p>
+      <p><a href="#" onclick="openLegal('terms');return false;" style="color:rgba(255,255,255,0.4);text-decoration:underline;cursor:pointer;">Terms of Service</a></p>
+      <p><a href="#" onclick="openLegal('privacy');return false;" style="color:rgba(255,255,255,0.4);text-decoration:underline;cursor:pointer;">Privacy Policy</a></p>
+      <a href="https://www.linkedin.com/company/getlandedca/" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#1D9E75;border-radius:6px;text-decoration:none;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white">
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+        </svg>
+      </a>
+    </div>
+  </footer>
+
+  <!-- ─── LEGAL MODAL (unchanged) ─── -->
+  <div id="legalModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:1000;overflow-y:auto;padding:2rem 1rem;">
+    <div style="max-width:720px;margin:2rem auto;background:#1a1a1a;border-radius:12px;padding:3rem 2.5rem;position:relative;">
+      <button onclick="closeLegal()" style="position:absolute;top:1.5rem;right:1.5rem;background:none;border:1px solid rgba(255,255,255,0.2);color:white;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;line-height:1;">✕</button>
+      <div id="legalContent" style="font-family:'DM Sans',sans-serif;color:rgba(255,255,255,0.8);font-size:0.9rem;line-height:1.75;"></div>
+    </div>
+  </div>
+
+  <script>
+    /* ─── LEGAL MODAL (unchanged) ─── */
+    const termsContent = `
+      <h2 style="font-size:2rem;font-family:'Bebas Neue',sans-serif;color:#1D9E75;margin-bottom:0.25rem;">Terms of Service</h2>
+      <p style="font-size:0.75rem;color:rgba(255,255,255,0.3);margin-bottom:2rem;">Last updated: May 2026</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">1. Acceptance of Terms</h3>
+      <p>By accessing or using the Landed website at getlanded.ca, you agree to be bound by these Terms of Service. If you do not agree, please do not use the Site. Landed is operated as a sole proprietorship based in Toronto, Ontario, Canada.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">2. Description of Service</h3>
+      <p>Landed is a career recovery platform currently in development. The Site is in a pre-launch phase and is collecting email addresses from individuals interested in receiving updates about the platform's launch. No products or services are currently being sold or delivered.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">3. Email Collection</h3>
+      <p>By submitting your email address, you consent to receiving updates and launch announcements from Landed. You may unsubscribe at any time by contacting us at hello@getlanded.ca.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">4. Not Professional Advice</h3>
+      <p>Landed is not a licensed career counseling service. Any content or guidance provided is for informational purposes only and does not constitute professional career, legal, financial, or psychological advice.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">5. Intellectual Property</h3>
+      <p>All content on this Site is the property of Landed and is protected under applicable Canadian and international intellectual property laws. You may not reproduce or use any content without prior written permission.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">5a. AI Prompts &amp; Proprietary Systems</h3>
+      <p>Landed's AI-powered features are built on proprietary system prompts, logic, and workflows that constitute confidential trade secrets and intellectual property of Landed. By using the platform, you agree not to: (i) attempt to reverse engineer, extract, reproduce, or expose any underlying prompts, instructions, or system configurations used by Landed's AI; (ii) use any method — including but not limited to prompt injection, adversarial inputs, or repeated querying — to infer, reconstruct, or replicate Landed's proprietary AI logic; or (iii) share, publish, or commercialize any output derived from attempting to extract Landed's underlying systems. Violations may result in immediate termination of access and legal action under applicable Canadian intellectual property and trade secret law.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">6. Limitation of Liability</h3>
+      <p>To the fullest extent permitted by law, Landed shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Site. Your use is at your own risk.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">7. Governing Law</h3>
+      <p>These Terms are governed by the laws of the Province of Ontario and the federal laws of Canada. Disputes shall be subject to the exclusive jurisdiction of the courts of Ontario.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">8. Contact</h3>
+      <p>Questions? Email us at <a href="mailto:hello@getlanded.ca" style="color:#1D9E75;">hello@getlanded.ca</a></p>
+    `;
+
+    const privacyContent = `
+      <h2 style="font-size:2rem;font-family:'Bebas Neue',sans-serif;color:#1D9E75;margin-bottom:0.25rem;">Privacy Policy</h2>
+      <p style="font-size:0.75rem;color:rgba(255,255,255,0.3);margin-bottom:2rem;">Last updated: May 2026</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">1. Overview</h3>
+      <p>Landed is committed to protecting your personal information. We comply with the Personal Information Protection and Electronic Documents Act (PIPEDA) and applicable Ontario privacy legislation.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">2. Information We Collect</h3>
+      <p>We collect only your email address when you voluntarily submit it through our early access form. We do not collect your name, phone number, payment information, or any other personal data at this time.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">3. How We Use Your Information</h3>
+      <p>Your email is used solely to send you updates about the Landed platform. We will not use it for any other purpose without your explicit consent.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">4. Data Sharing</h3>
+      <p>We do not sell or share your personal information. We use Formspree (formspree.io) to process form submissions. You can review their privacy policy at formspree.io/legal/privacy-policy.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">5. Your Rights</h3>
+      <p>Under PIPEDA, you have the right to access, correct, or request deletion of your personal information. To exercise these rights, contact us at <a href="mailto:hello@getlanded.ca" style="color:#1D9E75;">hello@getlanded.ca</a>.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">6. Cookies &amp; Analytics</h3>
+      <p>We use Google Analytics (GA4) to understand how visitors interact with our Site. GA4 may use cookies to collect anonymized usage data. You can opt out via tools.google.com/dlpage/gaoptout.</p>
+
+      <h3 style="font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;color:#1D9E75;margin:2rem 0 0.5rem;">7. Contact</h3>
+      <p>Privacy questions? Email us at <a href="mailto:hello@getlanded.ca" style="color:#1D9E75;">hello@getlanded.ca</a></p>
+    `;
+
+    function openLegal(type) {
+      document.getElementById('legalContent').innerHTML = type === 'terms' ? termsContent : privacyContent;
+      document.getElementById('legalModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLegal() {
+      document.getElementById('legalModal').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('legalModal').addEventListener('click', function(e) {
+      if (e.target === this) closeLegal();
+    });
+
+    /* ─── FORM SUBMISSION ─── */
+    function bindForm(formId, thankyouId, formWrapSelector) {
+      const form = document.getElementById(formId);
+      if (!form) return;
+      const thankyou = document.getElementById(thankyouId);
+      const btn = form.querySelector('button[type="submit"]');
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const data = new FormData(form);
+        const originalText = btn.textContent;
+
+        btn.textContent = 'Joining...';
+        btn.disabled = true;
+
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: data,
+            headers: { 'Accept': 'application/json' }
+          });
+
+          if (response.ok) {
+            // Hide the form wrapper and micro-copy, show confirmation
+            if (formWrapSelector) {
+              const wrap = document.querySelector(formWrapSelector);
+              if (wrap) wrap.style.display = 'none';
+            } else {
+              form.style.display = 'none';
+            }
+            // Also hide sibling micro-copy
+            const micro = form.closest('div') ? form.closest('div').querySelector('.form-micro, .final-micro') : null;
+            if (micro) micro.style.display = 'none';
+
+            thankyou.style.display = 'block';
+          } else {
+            btn.textContent = originalText;
+            btn.disabled = false;
+          }
+        } catch (err) {
+          console.error(err);
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }
+      });
+    }
+
+    // Hero form — hide the .form-wrap div on success
+    const heroForm = document.getElementById('heroForm');
+    if (heroForm) {
+      const thankyouHero = document.getElementById('thankyouHero');
+      const btn = heroForm.querySelector('button[type="submit"]');
+
+      heroForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const data = new FormData(heroForm);
+        const originalText = btn.textContent;
+        btn.textContent = 'Joining...';
+        btn.disabled = true;
+
+        try {
+          const response = await fetch(heroForm.action, {
+            method: 'POST',
+            body: data,
+            headers: { 'Accept': 'application/json' }
+          });
+
+          if (response.ok) {
+            document.querySelector('.form-wrap').style.display = 'none';
+            document.querySelector('.form-micro').style.display = 'none';
+            thankyouHero.style.display = 'block';
+          } else {
+            btn.textContent = originalText;
+            btn.disabled = false;
+          }
+        } catch (err) {
+          console.error(err);
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }
+      });
+    }
+
+    // Final form
+    const finalForm = document.getElementById('finalForm');
+    if (finalForm) {
+      const thankyouFinal = document.getElementById('thankyouFinal');
+      const btn = finalForm.querySelector('button[type="submit"]');
+
+      finalForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const data = new FormData(finalForm);
+        const originalText = btn.textContent;
+        btn.textContent = 'Joining...';
+        btn.disabled = true;
+
+        try {
+          const response = await fetch(finalForm.action, {
+            method: 'POST',
+            body: data,
+            headers: { 'Accept': 'application/json' }
+          });
+
+          if (response.ok) {
+            document.querySelector('.final-form-wrap').style.display = 'none';
+            document.querySelector('.final-micro').style.display = 'none';
+            thankyouFinal.style.display = 'block';
+          } else {
+            btn.textContent = originalText;
+            btn.disabled = false;
+          }
+        } catch (err) {
+          console.error(err);
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }
+      });
+    }
+
+    /* ─── STICKY NAV CTA ─── */
+    const navCTA = document.getElementById('navCTA');
+    const heroFormEl = document.getElementById('heroForm');
+
+    if (navCTA && heroFormEl) {
+      const observer = new IntersectionObserver(function([entry]) {
+        navCTA.style.opacity       = entry.isIntersecting ? '0' : '1';
+        navCTA.style.pointerEvents = entry.isIntersecting ? 'none' : 'auto';
+      }, { threshold: 0 });
+      observer.observe(heroFormEl);
+    }
+
+    /* ─── SCROLL FADE-UP ─── */
+    const fadeEls = document.querySelectorAll('.fade-up');
+    if ('IntersectionObserver' in window) {
+      const fadeObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            fadeObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      fadeEls.forEach(function(el) { fadeObserver.observe(el); });
+    } else {
+      // Fallback for browsers without IntersectionObserver
+      fadeEls.forEach(function(el) { el.classList.add('visible'); });
+    }
+  </script>
+
+</body>
+</html>
