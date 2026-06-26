@@ -14,6 +14,15 @@ import {
 } from '@/lib/supabase/server';
 
 interface RoadmapOutput {
+  runway?: {
+    display_state: 'exhausted' | 'critical' | 'normal';
+    figure: string | null;
+    show_date: boolean;
+    runway_date: string | null;
+    body: string;
+    net_monthly_gap: number | null;
+    runway_weeks: number | null;
+  };
   acknowledgment_line: string;
   pressure_points: string[];
   next_move: {
@@ -140,17 +149,23 @@ export default async function RoadmapPage({
             {modeLabel}
           </span>
         </div>
-        <div className="flex items-baseline gap-2">
-          <span className="font-display text-6xl text-brand">
-            {roadmap.runway_weeks != null
-              ? Number(roadmap.runway_weeks).toFixed(1)
-              : '—'}
-          </span>
-          <span className="text-muted">weeks of runway</span>
-        </div>
-        {roadmap.runway_date && (
-          <p className="text-muted mt-1">until around {roadmap.runway_date}</p>
-        )}
+        {output?.runway?.figure ? (
+  <div className="flex items-baseline gap-2">
+    <span className="font-display text-6xl text-brand">
+      {output.runway.figure}
+    </span>
+  </div>
+) : null}
+
+{output?.runway?.body && (
+  <p className="text-muted mt-1">{output.runway.body}</p>
+)}
+
+{output?.runway?.show_date && output?.runway?.runway_date && (
+  <p className="text-muted text-sm mt-1">
+    until around {output.runway.runway_date}
+  </p>
+)}
         {roadmap.net_monthly_gap != null && (
           <p className="text-muted text-sm mt-3">
             Monthly gap: ${roadmap.net_monthly_gap}
