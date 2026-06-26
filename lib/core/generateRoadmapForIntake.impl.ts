@@ -247,7 +247,10 @@ export async function generateRoadmapForIntake(
   }
 
   // ── 7 + tools: enforce critical/suppression server-side, not via AI ─
-  const finalOutput = applyServerRules(aiOutput, okMode, intake);
+  const finalOutput = {
+    ...applyServerRules(aiOutput, okMode, intake),
+    runway: runwayPayload,
+  };
 
   // ── 10 + 11: ONE transaction — roadmap INSERT + check_in INSERT ─────
   const newMode = okMode.mode;
