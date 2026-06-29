@@ -105,7 +105,10 @@ export default function LoginPage() {
             Create account
           </button>
         </div>
-
+        <p className="text-muted text-xs leading-relaxed pt-1">
+          After signing up, check your inbox or junk/spam folder for your Landed confirmation email.
+          If it lands in junk, mark it as "Not junk" before opening the link.
+</p>
         {status && <p className="text-muted text-sm pt-1">{status}</p>}
       </div>
     </main>

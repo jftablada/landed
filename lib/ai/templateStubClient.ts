@@ -24,6 +24,7 @@ interface InjectedContext {
     province: string;
     ei_status: string;
     housing_type: 'rent' | 'own';
+    debt_minimums: number;
   };
 }
 
@@ -62,6 +63,10 @@ function eiLine(eiStatus: string): string {
       return 'Check your EI status so we can factor it in.';
   }
 }
+function debtMinimumsLine(debtMin: number): string | null {
+  if (debtMin <= 0) return null;
+  return `Debt minimums tracked separately: about $${debtMin}/month — not counted in your runway because debt often has more room to negotiate than rent or food, but it’s still real and worth a plan.`;
+}
 
 // The four templates. Each returns the RoadmapOutput object.
 function buildOutput(inj: InjectedContext) {
@@ -72,6 +77,7 @@ function buildOutput(inj: InjectedContext) {
   const ei = inj.context.ei_status;
   const datePhrase = date ? ` (until around ${date})` : '';
   const gapPhrase = gap != null ? ` Your monthly shortfall is about $${gap}.` : '';
+  const debtLine = debtMinimumsLine(inj.context.debt_minimums);
 
   switch (inj.mode) {
     // ── CRITICAL ──────────────────────────────────────────────────────
@@ -81,10 +87,11 @@ function buildOutput(inj: InjectedContext) {
       return {
         acknowledgment_line:
           'Right now the priority is immediate stability — not a job search.',
-        pressure_points: [
-          'Confirmed cash can’t cover your immediate essentials',
-          'Stabilizing support comes before any career steps',
-        ],
+          pressure_points: [
+            'Confirmed cash can’t cover your immediate essentials',
+            'Stabilizing support comes before any career steps',
+            ...(debtLine ? [debtLine] : []),
+          ],
         next_move: {
           action: `Contact ${programs.join(' and ')} today to find emergency support in ${province}.`,
           why_first:
@@ -105,6 +112,7 @@ function buildOutput(inj: InjectedContext) {
           'Your confirmed runway is short',
           gap != null ? `A monthly shortfall of about $${gap}` : 'A monthly shortfall to close',
           'Job search comes after immediate pressure eases',
+          ...(debtLine ? [debtLine] : []),
         ],
         next_move: {
           action: eiLine(ei),
@@ -146,6 +154,7 @@ function buildOutput(inj: InjectedContext) {
           'Enough runway to search deliberately',
           gap != null ? `A monthly shortfall of about $${gap} to keep in view` : 'A shortfall to keep in view',
           'Stability and search can run in parallel now',
+          ...(debtLine ? [debtLine] : []),
         ],
         next_move: {
           action: 'Define the three roles you’d most want and could realistically land.',
@@ -188,6 +197,7 @@ function buildOutput(inj: InjectedContext) {
           'Strong runway — you can be selective',
           'Fit matters more than speed here',
           'Keep more than one path open',
+          ...(debtLine ? [debtLine] : []),
         ],
         next_move: {
           action: 'Draft a list of 10 organizations you’d genuinely want to work for — not job postings, companies.',

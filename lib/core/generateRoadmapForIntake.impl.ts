@@ -350,6 +350,7 @@ function assemblePrompt(
       pending_invoice_confirmed: intake.pending_invoice_confirmed,
       tax_obligation_status: intake.tax_obligation_status,
       has_interview_activity: intake.has_interview_activity ?? false,
+      debt_minimums: intake.debt_minimums,
     },
   };
 
