@@ -157,7 +157,7 @@ export default async function RoadmapPage({
   </div>
 ) : null}
 
-{output?.runway?.body && (
+{!output?.runway?.figure && output?.runway?.body && (
   <p className="text-muted mt-1">{output.runway.body}</p>
 )}
 
