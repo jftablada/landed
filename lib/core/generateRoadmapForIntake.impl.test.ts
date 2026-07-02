@@ -303,9 +303,10 @@ describe('validateRoadmapOutput', () => {
   it('strips code fences', () => {
     expect(validateRoadmapOutput('```json\n' + GOOD_AI_JSON + '\n```', fakeMode)).not.toBeNull();
   });
-  it('rejects > 3 pressure points', () => {
-    const bad = JSON.parse(GOOD_AI_JSON); bad.pressure_points = ['a','b','c','d'];
-    expect(validateRoadmapOutput(JSON.stringify(bad), fakeMode)).toBeNull();
+  it('accepts up to 4 pressure points', () => {
+    const good = JSON.parse(GOOD_AI_JSON);
+    good.pressure_points = ['a', 'b', 'c', 'd'];
+    expect(validateRoadmapOutput(JSON.stringify(good), fakeMode)).not.toBeNull();
   });
   it('rejects > 3 phases', () => {
     const bad = JSON.parse(GOOD_AI_JSON);

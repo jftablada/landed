@@ -383,7 +383,7 @@ export function validateRoadmapOutput(
   if (typeof o.acknowledgment_line !== 'string') return null;
 
   if (!Array.isArray(o.pressure_points)) return null;
-  if (o.pressure_points.length > 3) return null;
+  if (o.pressure_points.length > 4) return null;
   if (!o.pressure_points.every((p) => typeof p === 'string')) return null;
 
   const nm = o.next_move as Record<string, unknown> | undefined;
