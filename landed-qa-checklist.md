@@ -212,3 +212,24 @@ Account Provisioning Plan
     Manual create + SQL confirmation, or real signup if preferred. Tests:
     * Strategic roadmap render
     * debt-minimums card in Strategic
+
+⸻
+
+Task 0.4 — Production Smoke Test Result
+
+* Date: 2026-07-04
+* Result: PASS
+* Production URL: https://getlanded.ca
+* Email confirmation: ON
+* Custom SMTP: enabled
+    * Sender email: hello@getlanded.ca
+    * SMTP host: smtp.resend.com
+* Checks run:
+    * Fresh signup — PASS
+    * Confirmation email received — PASS
+    * Confirmation link redirected back to getlanded.ca — PASS
+    * Sign-in after confirmation — PASS
+    * Intake submission — PASS
+    * Roadmap rendered — PASS
+    * Runway fields populated — PASS
+* No blank page or error state observed.
