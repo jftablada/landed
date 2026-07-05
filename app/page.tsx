@@ -22,6 +22,7 @@ function MapIcon() {
     </svg>
   );
 }
+
 function BoltIcon() {
   return (
     <svg {...iconProps}>
@@ -29,6 +30,7 @@ function BoltIcon() {
     </svg>
   );
 }
+
 function LifeIcon() {
   return (
     <svg {...iconProps}>
@@ -37,6 +39,7 @@ function LifeIcon() {
     </svg>
   );
 }
+
 function ShieldIcon() {
   return (
     <svg {...iconProps}>
@@ -45,6 +48,7 @@ function ShieldIcon() {
     </svg>
   );
 }
+
 function LockIcon() {
   return (
     <svg {...iconProps}>
@@ -53,6 +57,7 @@ function LockIcon() {
     </svg>
   );
 }
+
 function LeafIcon() {
   return (
     <svg {...iconProps}>
@@ -79,14 +84,54 @@ export default function HomePage() {
 
       {/* ── Hero ────────────────────────────────────────────── */}
       <section className="relative overflow-hidden border-b border-hair">
+        {/* background image — atmosphere only */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-cover bg-center sm:bg-right"
+          style={{
+            backgroundImage: 'url(/images/landed/hero-background.png)',
+          }}
+        />
+
+        {/* readability overlay: dark left, warmer right */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              'radial-gradient(70% 60% at 75% 10%, rgba(29,158,117,0.18) 0%, rgba(20,84,63,0.12) 35%, rgba(11,12,13,0) 70%)',
+              'linear-gradient(90deg, rgba(11,12,13,0.97) 0%, rgba(11,12,13,0.85) 35%, rgba(11,12,13,0.45) 70%, rgba(11,12,13,0.25) 100%)',
           }}
         />
+
+        {/* mobile-only extra darkening — desktop unaffected */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 lg:hidden"
+          style={{
+            background: 'rgba(11,12,13,0.55)',
+          }}
+        />
+
+        {/* subtle green brand glow */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(60% 50% at 80% 15%, rgba(29,158,117,0.14) 0%, rgba(11,12,13,0) 60%)',
+          }}
+        />
+
+        {/* bottom fade into trust strip */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-24"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(11,12,13,0) 0%, rgba(11,12,13,1) 100%)',
+          }}
+        />
+
         <div className="relative mx-auto grid max-w-6xl gap-10 px-5 pt-14 pb-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           {/* Left: message */}
           <div>
@@ -142,7 +187,7 @@ export default function HomePage() {
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
               <a
                 href={STRIPE_URL}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-8 py-4 text-base font-semibold text-black transition-opacity hover:opacity-90"
+                className="inline-flex w-fit items-center gap-4 rounded-lg bg-brand px-6 py-3.5 text-sm font-semibold text-black transition-opacity hover:opacity-90"
               >
                 Start my 90-day recovery
                 <span aria-hidden>→</span>
