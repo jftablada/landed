@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-const STRIPE_URL = 'https://buy.stripe.com/3cIdR1eHx9LS9Un9Ez5gc00';
+const STRIPE_URL = 'https://buy.stripe.com/4gM00b8j97DK8QjeYT5gc01';
 
 /* ── Hand-written inline icons (no dependency) ──────────────── */
 const iconProps = {
@@ -268,7 +268,7 @@ export default function HomePage() {
             {
               n: '01',
               title: 'Pay securely through Stripe',
-              body: 'One-time $79 CAD. No subscription, nothing to cancel later.',
+              body: 'One-time $15 CAD founding customer price. No subscription, nothing to cancel later.',
             },
             {
               n: '02',
@@ -381,8 +381,8 @@ export default function HomePage() {
             Landed — 90-Day Career Recovery Sprint
           </p>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="font-display text-6xl text-text">$79</span>
-            <span className="text-muted">CAD · one-time</span>
+          <span className="font-display text-6xl text-text">$15</span>
+          <span className="text-muted">CAD · one-time founding customer price</span>
           </div>
 
           <ul className="mt-8 space-y-3">
@@ -439,7 +439,7 @@ export default function HomePage() {
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted">
               Your structured 90-day plan, with check-ins and Canadian context.
-              This is what your $79 gets you today.
+              This is what your founding customer price gets you today.
             </p>
           </div>
 
@@ -485,7 +485,7 @@ export default function HomePage() {
             Start my 90-day recovery
           </a>
           <p className="text-sm text-muted">
-            $79 CAD · one-time · 14-day full refund
+          $15 CAD · founding customer price · 14-day full refund
           </p>
         </div>
       </section>
