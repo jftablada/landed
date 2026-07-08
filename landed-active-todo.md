@@ -56,7 +56,7 @@ Current status:
   - not included today
 
 - [ ] Trust copy QA  
-  Confirm refund / no subscription / Stripe security copy is visible.
+Confirm low-cost / no subscription / Stripe security copy is visible.
 
 ---
 
@@ -190,7 +190,7 @@ These are intentionally deferred. Do not build or suggest unless the roadmap say
 - Interview Prep Studio is in development and not included today.
 - Contractor-to-Permanent Playbook is in development and not included today.
 - $79 CAD one-time price is locked for Phase 1.
-- 14-day full refund is locked.
-- Buyer keeps their roadmap after refund.
+- Money-back copy removed because the founding customer price is intentionally low.
+- Buyer-facing copy should emphasize one-time payment, no subscription, and no hidden renewal.
 - Founder onboarding within 24 hours is a public promise and must be honored.
 

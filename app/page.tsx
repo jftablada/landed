@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-const STRIPE_URL = 'https://buy.stripe.com/4gM00b8j97DK8QjeYT5gc01';
+const STRIPE_URL = 'https://buy.stripe.com/00wbITdDtgag2rV9Ez5gc02';
 
 /* ── Hand-written inline icons (no dependency) ──────────────── */
 const iconProps = {
@@ -193,8 +193,8 @@ export default function HomePage() {
                 <span aria-hidden>→</span>
               </a>
               <div className="text-sm text-muted">
-                <p className="font-medium text-text">
-                  14-day full refund, no questions.
+              <p className="font-medium text-text">
+                One-time founding customer price.
                 </p>
                 <p>Secure checkout through Stripe. No subscription.</p>
               </div>
@@ -233,8 +233,8 @@ export default function HomePage() {
           {[
             {
               icon: <ShieldIcon />,
-              title: '14-day full refund',
-              body: 'No questions asked. Keep your roadmap either way.',
+              title: 'No subscription',
+              body: 'One-time founding customer price. No hidden renewal.',
             },
             {
               icon: <LockIcon />,
@@ -268,7 +268,7 @@ export default function HomePage() {
             {
               n: '01',
               title: 'Pay securely through Stripe',
-              body: 'One-time $15 CAD founding customer price. No subscription, nothing to cancel later.',
+              body: 'One-time $5 CAD founding customer price. No subscription, nothing to cancel later.',
             },
             {
               n: '02',
@@ -381,7 +381,7 @@ export default function HomePage() {
             Landed — 90-Day Career Recovery Sprint
           </p>
           <div className="mt-4 flex items-baseline gap-2">
-          <span className="font-display text-6xl text-text">$15</span>
+          <span className="font-display text-6xl text-text">$5</span>
           <span className="text-muted">CAD · one-time founding customer price</span>
           </div>
 
@@ -393,7 +393,7 @@ export default function HomePage() {
               'Founder onboarding within 24 hours',
               '15-minute walkthrough call at the start',
               'Week-2 and Week-4 check-ins',
-              '14-day full refund, no questions',
+              'One-time founding customer price',
             ].map((item) => (
               <li key={item} className="flex items-start gap-3 text-text">
                 <span
@@ -417,8 +417,7 @@ export default function HomePage() {
             Secure checkout through Stripe. No subscription. No hidden renewal.
           </p>
           <p className="mt-2 text-center text-sm text-muted">
-            14-day full refund, no questions. You keep your roadmap after a
-            refund.
+          Kept intentionally low-cost while Landed is founder-led.
           </p>
         </div>
       </section>
@@ -485,7 +484,7 @@ export default function HomePage() {
             Start my 90-day recovery
           </a>
           <p className="text-sm text-muted">
-          $15 CAD · founding customer price · 14-day full refund
+          $5 CAD · one-time founding customer price · no subscription
           </p>
         </div>
       </section>
