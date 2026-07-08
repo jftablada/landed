@@ -160,7 +160,7 @@ Checklist:
 - Buyer added to funnel tracker
 - Supabase account manually created
 - Temporary password created
-- Welcome email sent within 24 hours
+- Welcome email sent within one business day
 - 15-minute walkthrough offered
 - Week-2 and Week-4 check-ins scheduled
 
@@ -192,5 +192,5 @@ These are intentionally deferred. Do not build or suggest unless the roadmap say
 - $79 CAD one-time price is locked for Phase 1.
 - Money-back copy removed because the founding customer price is intentionally low.
 - Buyer-facing copy should emphasize one-time payment, no subscription, and no hidden renewal.
-- Founder onboarding within 24 hours is a public promise and must be honored.
+- Founder onboarding within one business day is a public promise and must be honored.
 

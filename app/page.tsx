@@ -272,7 +272,7 @@ export default function HomePage() {
             },
             {
               n: '02',
-              title: 'Founder onboarding within 24 hours',
+              title: 'Founder onboarding within one business day',
               body: 'A direct welcome and a 15-minute walkthrough call to start.',
             },
             {
@@ -390,7 +390,7 @@ export default function HomePage() {
               '90-Day Recovery Roadmap',
               'Check-ins that update your plan',
               'Canadian context layer',
-              'Founder onboarding within 24 hours',
+           'Founder onboarding within one business day',
               '15-minute walkthrough call at the start',
               'Week-2 and Week-4 check-ins',
               'One-time founding customer price',
