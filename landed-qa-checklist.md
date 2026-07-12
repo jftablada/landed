@@ -208,10 +208,35 @@ Account Provisioning Plan
     Manual create + SQL confirmation, or real signup if preferred. Tests:
     * Balanced roadmap render
     * debt-minimums card in Balanced
+
+    Result — 2026-07-12 — PASS:
+    * Account: landed.test.balanced@gmail.com
+    * Inputs: confirmed_cash = $1,600; essential_burn = $1,000/month; debt_minimums = $700; tax = none; EI = not applied
+    * Runway: about 7 weeks, inside Balanced band
+    * Mode badge: "Room to act"
+    * Monthly gap: $1,000
+    * Debt card: about $700/month, informational
+    * Date line: single
+    * generation_failed: none
+    * Duplicate runway copy: none
+    * Follow-up: add boundary case near 8 weeks before calling mode QA fully complete
 * Account 3: Strategic
     Manual create + SQL confirmation, or real signup if preferred. Tests:
     * Strategic roadmap render
     * debt-minimums card in Strategic
+
+    Result — 2026-07-12 — PASS:
+    * Account: landed.test.strategic@gmail.com
+    * Inputs: confirmed_cash = $3,500; essential_burn = $1,000/month; debt_minimums = $700; tax = none; EI = not applied
+    * Runway: about 15 weeks, inside Strategic band
+    * Mode badge: "Room to choose"
+    * Monthly gap: $1,000
+    * Debt card: about $700/month, informational
+    * Date line: single
+    * generation_failed: none
+    * Duplicate runway copy: none
+    * Strategic content confirmed: 10-organization target list, intentional networking, evaluate fit
+    * Follow-up: add boundary case near 8 weeks before calling mode QA fully complete
 
 ⸻
 
