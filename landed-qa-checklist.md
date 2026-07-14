@@ -219,7 +219,6 @@ Account Provisioning Plan
     * Date line: single
     * generation_failed: none
     * Duplicate runway copy: none
-    * Follow-up: add boundary case near 8 weeks before calling mode QA fully complete
 * Account 3: Strategic
     Manual create + SQL confirmation, or real signup if preferred. Tests:
     * Strategic roadmap render
@@ -236,7 +235,6 @@ Account Provisioning Plan
     * generation_failed: none
     * Duplicate runway copy: none
     * Strategic content confirmed: 10-organization target list, intentional networking, evaluate fit
-    * Follow-up: add boundary case near 8 weeks before calling mode QA fully complete
 
 ⸻
 
