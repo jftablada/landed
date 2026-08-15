@@ -18,7 +18,16 @@
 -- it asserts p_user_id = auth.uid() and refuses otherwise.
 -- ════════════════════════════════════════════════════════════════════
 
-create or replace function insert_roadmap_and_checkin(
+begin;
+
+-- Replacing the old signature requires an explicit drop. Otherwise Postgres
+-- keeps both signatures as overloads and PostgREST cannot resolve the RPC.
+drop function if exists public.insert_roadmap_and_checkin(
+  uuid, uuid, uuid, text, numeric, date, numeric, text, boolean, text, jsonb,
+  uuid, boolean, text, text, text
+);
+
+create or replace function public.insert_roadmap_and_checkin(
   -- roadmap fields
   p_intake_id       uuid,
   p_journey_id      uuid,
@@ -36,7 +45,11 @@ create or replace function insert_roadmap_and_checkin(
   p_mode_changed        boolean,
   p_previous_mode       text,
   p_new_mode            text,
-  p_change_summary      text
+  p_change_summary      text,
+  p_applications_submitted integer default null,
+  p_employer_responses     integer default null,
+  p_interviews_secured     integer default null,
+  p_biggest_barrier        text default null
 )
 returns jsonb
 language plpgsql
@@ -105,11 +118,13 @@ begin
   insert into check_ins (
     journey_id, user_id,
     previous_roadmap_id, new_roadmap_id,
-    mode_changed, previous_mode, new_mode, change_summary
+    mode_changed, previous_mode, new_mode, change_summary,
+    applications_submitted, employer_responses, interviews_secured, biggest_barrier
   ) values (
     p_journey_id, p_user_id,
     p_previous_roadmap_id, v_new_roadmap_id,
-    p_mode_changed, p_previous_mode, p_new_mode, p_change_summary
+    p_mode_changed, p_previous_mode, p_new_mode, p_change_summary,
+    p_applications_submitted, p_employer_responses, p_interviews_secured, p_biggest_barrier
   )
   returning id into v_new_checkin_id;
 
@@ -147,5 +162,16 @@ exception
 end;
 $$;
 
--- Allow authenticated users to call it. RLS inside still scopes all rows.
-grant execute on function insert_roadmap_and_checkin to authenticated;
+-- Preserve the live execute privileges. RLS and the auth.uid() guard still
+-- scope every call to the authenticated owner.
+grant execute on function public.insert_roadmap_and_checkin(
+  uuid, uuid, uuid, text, numeric, date, numeric, text, boolean, text, jsonb,
+  uuid, boolean, text, text, text, integer, integer, integer, text
+) to public;
+
+grant execute on function public.insert_roadmap_and_checkin(
+  uuid, uuid, uuid, text, numeric, date, numeric, text, boolean, text, jsonb,
+  uuid, boolean, text, text, text, integer, integer, integer, text
+) to authenticated;
+
+commit;

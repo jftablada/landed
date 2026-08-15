@@ -28,6 +28,10 @@ export default function CheckinClient() {
   const [debtMinimums, setDebtMinimums] = useState('0');
   const [eiStatus, setEiStatus] = useState('not_applied');
   const [eiAmount, setEiAmount] = useState('');
+  const [applicationsSubmitted, setApplicationsSubmitted] = useState('');
+  const [employerResponses, setEmployerResponses] = useState('');
+  const [interviewsSecured, setInterviewsSecured] = useState('');
+  const [biggestBarrier, setBiggestBarrier] = useState('');
 
   const labelCls = 'text-muted text-sm';
   const fieldCls =
@@ -109,6 +113,42 @@ export default function CheckinClient() {
       return;
     }
 
+    const applicationsSubmittedNumber = Number(applicationsSubmitted);
+    const employerResponsesNumber = Number(employerResponses);
+    const interviewsSecuredNumber = Number(interviewsSecured);
+
+    if (
+      applicationsSubmitted === '' ||
+      !Number.isInteger(applicationsSubmittedNumber) ||
+      applicationsSubmittedNumber < 0
+    ) {
+      setError('Enter applications submitted as a whole number.');
+      return;
+    }
+
+    if (
+      employerResponses === '' ||
+      !Number.isInteger(employerResponsesNumber) ||
+      employerResponsesNumber < 0
+    ) {
+      setError('Enter employer responses as a whole number.');
+      return;
+    }
+
+    if (
+      interviewsSecured === '' ||
+      !Number.isInteger(interviewsSecuredNumber) ||
+      interviewsSecuredNumber < 0
+    ) {
+      setError('Enter interviews secured as a whole number.');
+      return;
+    }
+
+    if (!biggestBarrier) {
+      setError('Choose your biggest barrier.');
+      return;
+    }
+
     const changes: Record<string, number | string | null> = {};
 
     if (confirmedCash !== original.confirmedCash) {
@@ -134,11 +174,6 @@ export default function CheckinClient() {
           : null;
     }
 
-    if (Object.keys(changes).length === 0) {
-      setError('Nothing changed. Update a value, or go back to your plan.');
-      return;
-    }
-
     setSubmitting(true);
 
     try {
@@ -148,6 +183,10 @@ export default function CheckinClient() {
         body: JSON.stringify({
           journey_id: journeyId,
           changes,
+          applications_submitted: applicationsSubmittedNumber,
+          employer_responses: employerResponsesNumber,
+          interviews_secured: interviewsSecuredNumber,
+          biggest_barrier: biggestBarrier,
         }),
       });
 
@@ -196,10 +235,98 @@ export default function CheckinClient() {
       </h1>
 
       <p className="text-muted mb-10">
-        Update only what moved. We’ll keep the rest of your plan intact.
+        Tell us what happened in your search, then update any financial details
+        that changed.
       </p>
 
       <div className="space-y-5">
+        <h2 className="font-display text-2xl text-text">Your job search</h2>
+
+        <div className="flex flex-col gap-1.5">
+          <label className={labelCls} htmlFor="applications-submitted">
+            How many jobs have you applied to since your last check-in?
+          </label>
+          <input
+            id="applications-submitted"
+            className={fieldCls}
+            type="number"
+            min="0"
+            step="1"
+            value={applicationsSubmitted}
+            onChange={(e) => setApplicationsSubmitted(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className={labelCls} htmlFor="employer-responses">
+            How many employers or recruiters responded since your last
+            check-in?
+          </label>
+          <input
+            id="employer-responses"
+            className={fieldCls}
+            type="number"
+            min="0"
+            step="1"
+            value={employerResponses}
+            onChange={(e) => setEmployerResponses(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className={labelCls} htmlFor="interviews-secured">
+            How many interviews did you secure since your last check-in?
+          </label>
+          <input
+            id="interviews-secured"
+            className={fieldCls}
+            type="number"
+            min="0"
+            step="1"
+            value={interviewsSecured}
+            onChange={(e) => setInterviewsSecured(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className={labelCls} htmlFor="biggest-barrier">
+            What was your biggest barrier?
+          </label>
+          <select
+            id="biggest-barrier"
+            className={fieldCls}
+            value={biggestBarrier}
+            onChange={(e) => setBiggestBarrier(e.target.value)}
+          >
+            <option value="">Select one</option>
+            <option value="Couldn't find enough suitable jobs">
+              Couldn’t find enough suitable jobs
+            </option>
+            <option value="Unsure which jobs were worth applying to">
+              Unsure which jobs were worth applying to
+            </option>
+            <option value="Resume/applications took too long">
+              Resume/applications took too long
+            </option>
+            <option value="Applied but wasn't hearing back">
+              Applied but wasn’t hearing back
+            </option>
+            <option value="Interview preparation">
+              Interview preparation
+            </option>
+            <option value="Motivation/energy">Motivation/energy</option>
+            <option value="Financial pressure">Financial pressure</option>
+            <option value="Personal responsibilities">
+              Personal responsibilities
+            </option>
+            <option value="Something else">Something else</option>
+          </select>
+        </div>
+
+        <h2 className="pt-4 font-display text-2xl text-text">
+          Your financial situation
+        </h2>
+
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
             <label className={labelCls}>Cash on hand ($)</label>
@@ -274,20 +401,7 @@ export default function CheckinClient() {
           </div>
         )}
 
-        {error && (
-          <div className="space-y-2">
-            <p className="text-red-400 text-sm">{error}</p>
-
-            {error.includes('Nothing changed') && (
-              <a
-                href="/start"
-                className="inline-block text-sm text-brand hover:underline"
-              >
-                ← Back to my current plan
-              </a>
-            )}
-          </div>
-        )}
+        {error && <p className="text-red-400 text-sm">{error}</p>}
 
         <button
           onClick={handleSubmit}

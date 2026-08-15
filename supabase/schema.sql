@@ -193,7 +193,13 @@ create table check_ins (
   new_mode            text,
 
   -- What the user reported changing (free-form note or structured later).
-  change_summary      text
+  change_summary      text,
+
+  -- Job-search activity reported for this check-in period.
+  applications_submitted integer,
+  employer_responses     integer,
+  interviews_secured     integer,
+  biggest_barrier        text
 );
 
 create index idx_check_ins_journey on check_ins(journey_id, created_at);

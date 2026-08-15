@@ -144,6 +144,10 @@ export function createSupabaseDbClient(
         p_previous_mode: ci.previous_mode,
         p_new_mode: ci.new_mode,
         p_change_summary: ci.change_summary,
+        p_applications_submitted: ci.applications_submitted,
+        p_employer_responses: ci.employer_responses,
+        p_interviews_secured: ci.interviews_secured,
+        p_biggest_barrier: ci.biggest_barrier,
       });
 
       if (error) throw normalize(error);

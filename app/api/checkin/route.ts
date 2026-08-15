@@ -47,6 +47,43 @@ const CARRY_FORWARD_FIELDS = [
   'upside_notes',
 ] as const;
 
+const MAX_ACTIVITY_COUNT = 10_000;
+
+const BIGGEST_BARRIERS = new Set<string>([
+  "Couldn't find enough suitable jobs",
+  'Unsure which jobs were worth applying to',
+  'Resume/applications took too long',
+  "Applied but wasn't hearing back",
+  'Interview preparation',
+  'Motivation/energy',
+  'Financial pressure',
+  'Personal responsibilities',
+  'Something else',
+]);
+
+function isNullableActivityCount(
+  value: unknown,
+): value is number | null | undefined {
+  return (
+    value === null ||
+    value === undefined ||
+    (typeof value === 'number' &&
+      Number.isInteger(value) &&
+      value >= 0 &&
+      value <= MAX_ACTIVITY_COUNT)
+  );
+}
+
+function isNullableBiggestBarrier(
+  value: unknown,
+): value is string | null | undefined {
+  return (
+    value === null ||
+    value === undefined ||
+    (typeof value === 'string' && BIGGEST_BARRIERS.has(value))
+  );
+}
+
 export async function POST(req: Request) {
   try {
     // ── 1. auth ───────────────────────────────────────────────────────
@@ -60,6 +97,10 @@ export async function POST(req: Request) {
     const journeyId: string | undefined = body?.journey_id;
     const changes: Record<string, unknown> = body?.changes ?? {};
     const changeSummary: string | null = body?.change_summary ?? null;
+    const rawApplicationsSubmitted: unknown = body?.applications_submitted;
+    const rawEmployerResponses: unknown = body?.employer_responses;
+    const rawInterviewsSecured: unknown = body?.interviews_secured;
+    const rawBiggestBarrier: unknown = body?.biggest_barrier;
 
     if (!journeyId) {
       return NextResponse.json(
@@ -67,6 +108,32 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
+
+    if (
+      !isNullableActivityCount(rawApplicationsSubmitted) ||
+      !isNullableActivityCount(rawEmployerResponses) ||
+      !isNullableActivityCount(rawInterviewsSecured)
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            'Activity counts must be whole numbers between 0 and 10,000.',
+        },
+        { status: 400 },
+      );
+    }
+
+    if (!isNullableBiggestBarrier(rawBiggestBarrier)) {
+      return NextResponse.json(
+        { error: 'biggest_barrier must be one of the supported options.' },
+        { status: 400 },
+      );
+    }
+
+    const applicationsSubmitted = rawApplicationsSubmitted ?? null;
+    const employerResponses = rawEmployerResponses ?? null;
+    const interviewsSecured = rawInterviewsSecured ?? null;
+    const biggestBarrier = rawBiggestBarrier ?? null;
 
     const supabase = await createSupabaseServerClient();
 
@@ -180,7 +247,15 @@ export async function POST(req: Request) {
     // previous_roadmap_id set and mode_changed computed.
     const db = createSupabaseDbClient(supabase, userId);
     const result = await generateRoadmapForIntake(
-      { intakeId: newIntake.id, userId, changeSummary },
+      {
+        intakeId: newIntake.id,
+        userId,
+        changeSummary,
+        applicationsSubmitted,
+        employerResponses,
+        interviewsSecured,
+        biggestBarrier,
+      },
       { db, ai: templateStubClient, systemPrompt: SYSTEM_PROMPT },
     );
 

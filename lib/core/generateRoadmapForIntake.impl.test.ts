@@ -212,6 +212,48 @@ describe('happy path', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────
+describe('check-in activity persistence', () => {
+  it('forwards activity values through the blocked-path check-in builder', async () => {
+    const db = fakeDb({ intake: baseIntake({ tax_obligation_status: 'unsure' }) });
+
+    await generateRoadmapForIntake(
+      {
+        intakeId: 'intake-1',
+        userId: 'user-1',
+        applicationsSubmitted: 7,
+        employerResponses: 2,
+        interviewsSecured: 1,
+        biggestBarrier: 'Motivation/energy',
+      },
+      deps(db, fakeAi([GOOD_AI_JSON])),
+    );
+
+    expect(db.inserts[0].checkIn).toMatchObject({
+      applications_submitted: 7,
+      employer_responses: 2,
+      interviews_secured: 1,
+      biggest_barrier: 'Motivation/energy',
+    });
+  });
+
+  it('writes null activity values through the successful-path check-in builder when omitted', async () => {
+    const db = fakeDb({ intake: baseIntake() });
+
+    await generateRoadmapForIntake(
+      { intakeId: 'intake-1', userId: 'user-1' },
+      deps(db, fakeAi([GOOD_AI_JSON])),
+    );
+
+    expect(db.inserts[0].checkIn).toMatchObject({
+      applications_submitted: null,
+      employer_responses: null,
+      interviews_secured: null,
+      biggest_barrier: null,
+    });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
 describe('AI failure is snapshot-safe', () => {
   it('returns ai_failed and writes NOTHING after two bad responses', async () => {
     const db = fakeDb({ intake: baseIntake() });

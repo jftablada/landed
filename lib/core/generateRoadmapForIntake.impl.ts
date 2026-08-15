@@ -84,6 +84,10 @@ export interface CheckInInsert {
   previous_mode: string | null;
   new_mode: string | null;
   change_summary: string | null;
+  applications_submitted: number | null;
+  employer_responses: number | null;
+  interviews_secured: number | null;
+  biggest_barrier: string | null;
 }
 
 export interface DbClient {
@@ -196,6 +200,10 @@ export async function generateRoadmapForIntake(
         previous_mode: previousMode,
         new_mode: null,
         change_summary: opts.changeSummary ?? null,
+        applications_submitted: opts.applicationsSubmitted ?? null,
+        employer_responses: opts.employerResponses ?? null,
+        interviews_secured: opts.interviewsSecured ?? null,
+        biggest_barrier: opts.biggestBarrier ?? null,
       }),
     );
 
@@ -279,6 +287,10 @@ export async function generateRoadmapForIntake(
       previous_mode: previousMode,
       new_mode: newMode,
       change_summary: opts.changeSummary ?? null,
+      applications_submitted: opts.applicationsSubmitted ?? null,
+      employer_responses: opts.employerResponses ?? null,
+      interviews_secured: opts.interviewsSecured ?? null,
+      biggest_barrier: opts.biggestBarrier ?? null,
     }),
   );
 

@@ -47,6 +47,10 @@ export interface GenerateOptions {
   intakeId: string;
   userId: string;
   changeSummary?: string | null;
+  applicationsSubmitted?: number | null;
+  employerResponses?: number | null;
+  interviewsSecured?: number | null;
+  biggestBarrier?: string | null;
 }
 
 export type GenerateResult =
