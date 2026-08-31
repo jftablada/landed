@@ -106,6 +106,15 @@ export default function LoginPage() {
           </button>
         </div>
         <p className="text-muted text-xs leading-relaxed pt-1">
+          Trouble signing in? Email{' '}
+          <a
+            href="mailto:hello@getlanded.ca"
+            className="underline hover:text-text"
+          >
+            hello@getlanded.ca
+          </a>
+        </p>
+        <p className="text-muted text-xs leading-relaxed pt-1">
           After signing up, check your inbox or junk/spam folder for your Landed confirmation email.
           If it lands in junk, mark it as "Not junk" before opening the link.
 </p>
