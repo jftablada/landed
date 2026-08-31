@@ -273,7 +273,7 @@ export default function HomePage() {
             {
               n: '02',
               title: 'Founder onboarding within one business day',
-              body: 'A direct welcome and a 15-minute walkthrough call to start.',
+              body: 'A direct welcome, then a personal review of your roadmap once it is generated.',
             },
             {
               n: '03',
@@ -391,7 +391,7 @@ export default function HomePage() {
               'Check-ins that update your plan',
               'Canadian context layer',
            'Founder onboarding within one business day',
-              '15-minute walkthrough call at the start',
+              'Personal roadmap review from the founder',
               'Week-2 and Week-4 check-ins',
               'One-time founding customer price',
             ].map((item) => (
