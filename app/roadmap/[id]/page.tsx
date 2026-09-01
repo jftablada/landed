@@ -8,6 +8,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import LogoutButton from '@/app/components/LogoutButton';
+import type { AdaptivePayload } from '@/lib/core/generateRoadmapForIntake';
 import {
   getAuthedUserId,
   createSupabaseServerClient,
@@ -23,6 +24,7 @@ interface RoadmapOutput {
     net_monthly_gap: number | null;
     runway_weeks: number | null;
   };
+  adaptive?: AdaptivePayload;
   acknowledgment_line: string;
   pressure_points: string[];
   next_move: {
@@ -172,6 +174,49 @@ export default async function RoadmapPage({
           </p>
         )}
       </section>
+
+      {/* Adaptive check-in — present only on activity-aware roadmaps */}
+      {output?.adaptive ? (
+        <section
+          className={`rounded-xl border bg-surface p-6 mb-12 ${
+            output.adaptive.diagnosis_withheld
+              ? 'border-hair'
+              : 'border-brand-soft'
+          }`}
+        >
+          <h2 className="text-muted text-sm uppercase tracking-widest mb-5">
+            Since your last check-in
+          </h2>
+          <div className="space-y-5">
+            <div>
+              <h3 className="text-muted text-sm mb-1">What changed</h3>
+              <p className="text-text leading-relaxed">
+                {output.adaptive.what_changed}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-muted text-sm mb-1">What this suggests</h3>
+              <p className="text-text leading-relaxed">
+                {output.adaptive.what_this_suggests}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-muted text-sm mb-1">
+                This week&apos;s priority
+              </h3>
+              <p className="text-text text-lg leading-relaxed">
+                {output.adaptive.this_weeks_priority}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-muted text-sm mb-1">Why</h3>
+              <p className="text-muted leading-relaxed">
+                {output.adaptive.why}
+              </p>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* Pressure points */}
       {output?.pressure_points?.length ? (

@@ -10,6 +10,24 @@ export interface RunwayPayload {
   runway_weeks: number;
 }
 
+export interface AdaptivePayload {
+  what_changed: string;
+  what_this_suggests: string;
+  this_weeks_priority: string;
+  why: string;
+  rule_fired:
+    | 'offer_received'
+    | 'financial_deterioration'
+    | 'interviews_occurring'
+    | 'barrier_low_capacity'
+    | 'volume_gate_insufficient'
+    | 'low_response_rate'
+    | 'healthy_response_rate'
+    | 'barrier_role_targeting'
+    | 'neutral_progress';
+  diagnosis_withheld: boolean;
+}
+
 export interface RoadmapPhase {
   title: string;
   actions: string[];
@@ -17,6 +35,7 @@ export interface RoadmapPhase {
 
 export interface RoadmapOutput {
   runway?: RunwayPayload;
+  adaptive?: AdaptivePayload;
   acknowledgment_line: string;
   pressure_points: string[];
   next_move: {

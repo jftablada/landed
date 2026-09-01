@@ -132,6 +132,7 @@ describe('idempotency', () => {
   it('returns existing roadmap, never calls AI or inserts', async () => {
     const existing: RoadmapRow = {
       id: 'roadmap-existing', intake_id: 'intake-1', journey_id: 'journey-1',
+      created_at: '2026-06-01T00:00:00Z',
       user_id: 'user-1', computed_mode: 'balanced', runway_weeks: 5,
       runway_date: '2026-07-20', net_monthly_gap: 3000, display_state: 'normal',
       blocked: false, block_reason: null, output_json: null,
@@ -195,6 +196,7 @@ describe('happy path', () => {
   it('mode_changed true when prior roadmap had a different mode', async () => {
     const prior: RoadmapRow = {
       id: 'roadmap-prior', intake_id: 'intake-0', journey_id: 'journey-1',
+      created_at: '2026-05-26T00:00:00Z',
       user_id: 'user-1', computed_mode: 'survival', runway_weeks: 2,
       runway_date: '2026-06-30', net_monthly_gap: 3000, display_state: 'normal',
       blocked: false, block_reason: null, output_json: null,
@@ -208,6 +210,46 @@ describe('happy path', () => {
     } else {
       throw new Error('expected ok');
     }
+  });
+
+  it('persists adaptive output using activity and prior-roadmap age', async () => {
+    const prior: RoadmapRow = {
+      id: 'roadmap-prior', intake_id: 'intake-0', journey_id: 'journey-1',
+      created_at: '2026-06-01T00:00:00Z',
+      user_id: 'user-1', computed_mode: 'strategic', runway_weeks: 16,
+      runway_date: '2026-09-01', net_monthly_gap: 3000, display_state: 'normal',
+      blocked: false, block_reason: null, output_json: null,
+    };
+    const db = fakeDb({ intake: baseIntake(), priorRoadmap: prior });
+
+    const result = await generateRoadmapForIntake(
+      {
+        intakeId: 'intake-1',
+        userId: 'user-1',
+        applicationsSubmitted: 20,
+        employerResponses: 3,
+        interviewsSecured: 0,
+        biggestBarrier: 'Something else',
+      },
+      deps(db, fakeAi([GOOD_AI_JSON])),
+    );
+
+    expect(result.status).toBe('ok');
+    expect(db.inserts[0].roadmap.output_json?.adaptive).toMatchObject({
+      rule_fired: 'healthy_response_rate',
+      diagnosis_withheld: false,
+    });
+  });
+
+  it('omits adaptive output when activity was not submitted', async () => {
+    const db = fakeDb({ intake: baseIntake() });
+
+    await generateRoadmapForIntake(
+      { intakeId: 'intake-1', userId: 'user-1' },
+      deps(db, fakeAi([GOOD_AI_JSON])),
+    );
+
+    expect(db.inserts[0].roadmap.output_json).not.toHaveProperty('adaptive');
   });
 });
 

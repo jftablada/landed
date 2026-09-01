@@ -17,7 +17,13 @@
 //   6. Idempotent: existing roadmap short-circuits, no AI, no insert.
 //   7. Snapshot-safe: AI failure writes nothing, returns ai_failed.
 
-import { computeMode, type Intake, type ModeResultOk } from './computeMode';
+import {
+  computeMode,
+  type Intake,
+  type Mode,
+  type ModeResultOk,
+} from './computeMode';
+import { buildAdaptivePayload } from './buildAdaptivePayload';
 import { buildRunwayView, formatRunway } from './runwayDisplay';
 import type {
   GenerateOptions,
@@ -51,7 +57,8 @@ export interface RoadmapRow {
   intake_id: string;
   journey_id: string;
   user_id: string;
-  computed_mode: string | null;
+  created_at: string;
+  computed_mode: Mode | null;
   runway_weeks: number | null;
   runway_date: string | null;
   net_monthly_gap: number | null;
@@ -254,14 +261,35 @@ export async function generateRoadmapForIntake(
     return { status: 'ai_failed', intakeId, journeyId };
   }
 
+  const newMode = okMode.mode;
+  const elapsedDays = prior
+    ? Math.max(
+        0,
+        Math.floor(
+          (now.getTime() - new Date(prior.created_at).getTime()) /
+            (24 * 60 * 60 * 1000),
+        ),
+      )
+    : 0;
+  const adaptivePayload =
+    buildAdaptivePayload({
+      applicationsSubmitted: opts.applicationsSubmitted,
+      employerResponses: opts.employerResponses,
+      interviewsSecured: opts.interviewsSecured,
+      biggestBarrier: opts.biggestBarrier,
+      elapsedDays,
+      previousMode,
+      currentMode: newMode,
+    }) ?? undefined;
+
   // ── 7 + tools: enforce critical/suppression server-side, not via AI ─
   const finalOutput = {
     ...applyServerRules(aiOutput, okMode, intake),
     runway: runwayPayload,
+    ...(adaptivePayload ? { adaptive: adaptivePayload } : {}),
   };
 
   // ── 10 + 11: ONE transaction — roadmap INSERT + check_in INSERT ─────
-  const newMode = okMode.mode;
   const roadmapInsert: RoadmapInsert = {
     intake_id: intakeId,
     journey_id: journeyId,
