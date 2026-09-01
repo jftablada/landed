@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 
@@ -18,29 +18,53 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [arrivedFromCheckout, setArrivedFromCheckout] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setArrivedFromCheckout(params.get('checkout') === 'success');
+  }, []);
 
   async function signUp() {
     setBusy(true);
     setStatus(null);
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+    });
     setBusy(false);
 
     if (error) {
       setStatus(`Couldn’t sign up: ${error.message}`);
       return;
     }
-    // Email confirmation is off in dev, so a new account can go straight in.
-    setStatus('Account created. Taking you to your plan…');
-    router.push('/start');
+    if (data.session) {
+      setStatus('Account created. Taking you to your plan…');
+      router.push('/start');
+      return;
+    }
+
+    setStatus(
+      'Account created. Check your inbox or junk/spam folder for the confirmation email, then return here to sign in.',
+    );
   }
 
   async function signIn() {
     setBusy(true);
     setStatus(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
     setBusy(false);
 
     if (error) {
+      if (error.message.toLowerCase().includes('email not confirmed')) {
+        setStatus(
+          'Confirm your email before signing in. Check your inbox or junk/spam folder for the Landed confirmation email.',
+        );
+        return;
+      }
       setStatus('That email or password didn’t match. Try again.');
       return;
     }
@@ -56,10 +80,12 @@ export default function LoginPage() {
     <main className="mx-auto w-full max-w-sm px-5 py-20">
       <p className="text-muted text-sm uppercase tracking-widest mb-2">Landed</p>
       <h1 className="font-display text-4xl leading-tight mb-2 max-w-xs text-balance">
-        You just got the call. Now what?
+        {arrivedFromCheckout ? 'Payment received. Let’s get you started.' : 'You just got the call. Now what?'}
       </h1>
       <p className="text-muted mb-10">
-        Sign in, or create an account to build your recovery plan.
+        {arrivedFromCheckout
+          ? 'Create your Landed account below using the email address from checkout.'
+          : 'Sign in, or create an account to build your recovery plan.'}
       </p>
 
       <div className="space-y-4">
