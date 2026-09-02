@@ -101,7 +101,15 @@ export default function LoginPage() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-muted text-sm">Password</label>
+          <div className="flex items-center justify-between gap-4">
+            <label className="text-muted text-sm">Password</label>
+            <a
+              href="/forgot-password"
+              className="text-muted text-xs underline hover:text-text"
+            >
+              Forgot password?
+            </a>
+          </div>
           <input
             className={fieldCls}
             type="password"
