@@ -204,6 +204,36 @@ create table check_ins (
 
 create index idx_check_ins_journey on check_ins(journey_id, created_at);
 
+-- ────────────────────────────────────────────────────────────────────
+-- roadmap_task_progress — mutable completion state for tasks derived
+-- from an immutable roadmap. Task wording remains in output_json.
+-- ────────────────────────────────────────────────────────────────────
+create table roadmap_task_progress (
+  id           uuid primary key default gen_random_uuid(),
+  roadmap_id   uuid not null references roadmaps(id) on delete cascade,
+  user_id      uuid not null references profiles(id) on delete cascade,
+  task_key     text not null,
+  completed    boolean not null default false,
+  completed_at timestamptz,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now(),
+
+  constraint roadmap_task_progress_key_format
+    check (
+      task_key in ('adaptive_priority', 'next_move')
+      or task_key ~ '^phase_[0-9]+_action_[0-9]+$'
+    ),
+  constraint roadmap_task_progress_completed_at
+    check (
+      (completed = true and completed_at is not null)
+      or (completed = false and completed_at is null)
+    ),
+  constraint uniq_roadmap_task_progress unique (roadmap_id, task_key)
+);
+
+create index idx_roadmap_task_progress_user
+  on roadmap_task_progress(user_id, roadmap_id);
+
 -- ════════════════════════════════════════════════════════════════════
 -- ROW LEVEL SECURITY
 -- Every table holds user-owned financial data. Lock all access to the
@@ -216,6 +246,10 @@ alter table intakes    enable row level security;
 alter table burn_items enable row level security;
 alter table roadmaps   enable row level security;
 alter table check_ins  enable row level security;
+alter table roadmap_task_progress enable row level security;
+
+revoke all on table roadmap_task_progress from anon;
+grant select, insert, update on table roadmap_task_progress to authenticated;
 
 -- profiles: a user sees and edits only their own profile row.
 create policy profiles_select on profiles
@@ -260,6 +294,29 @@ create policy check_ins_select on check_ins
   for select using (user_id = auth.uid());
 create policy check_ins_insert on check_ins
   for insert with check (user_id = auth.uid());
+
+-- roadmap task progress — mutable, but only for tasks on the owner's roadmap.
+create policy roadmap_task_progress_select on roadmap_task_progress
+  for select using (user_id = auth.uid());
+create policy roadmap_task_progress_insert on roadmap_task_progress
+  for insert with check (
+    user_id = auth.uid()
+    and exists (
+      select 1 from roadmaps
+      where roadmaps.id = roadmap_task_progress.roadmap_id
+        and roadmaps.user_id = auth.uid()
+    )
+  );
+create policy roadmap_task_progress_update on roadmap_task_progress
+  for update using (user_id = auth.uid())
+  with check (
+    user_id = auth.uid()
+    and exists (
+      select 1 from roadmaps
+      where roadmaps.id = roadmap_task_progress.roadmap_id
+        and roadmaps.user_id = auth.uid()
+    )
+  );
 
 -- ════════════════════════════════════════════════════════════════════
 -- NOTES / ASSUMPTIONS

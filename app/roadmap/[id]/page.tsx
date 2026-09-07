@@ -8,6 +8,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import LogoutButton from '@/app/components/LogoutButton';
+import WeeklyTasksClient from './WeeklyTasksClient';
 import type { AdaptivePayload } from '@/lib/core/generateRoadmapForIntake';
 import {
   getAuthedUserId,
@@ -217,6 +218,8 @@ export default async function RoadmapPage({
           </div>
         </section>
       ) : null}
+
+      <WeeklyTasksClient roadmapId={roadmap.id} />
 
       {/* Pressure points */}
       {output?.pressure_points?.length ? (
