@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import HomeMiniIntake from '@/app/components/HomeMiniIntake';
 
 const STRIPE_URL = 'https://buy.stripe.com/00wbITdDtgag2rV9Ez5gc02';
 
@@ -257,6 +258,8 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      <HomeMiniIntake checkoutUrl={STRIPE_URL} />
 
       {/* ── What happens after you pay ──────────────────────── */}
       <section className="mx-auto max-w-6xl px-5 py-16">
