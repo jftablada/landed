@@ -497,6 +497,10 @@ export default function HomePage() {
             <Link href="/login" className="underline hover:text-text">
               Sign in
             </Link>
+            {' · '}
+            <Link href="/about" className="underline hover:text-text">
+              About Landed
+            </Link>
             {' · Questions? '}
             <a
               href="mailto:hello@getlanded.ca"
