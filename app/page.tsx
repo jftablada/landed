@@ -211,9 +211,6 @@ export default function HomePage() {
                   'linear-gradient(160deg, rgba(29,158,117,0.14) 0%, rgba(21,23,26,1) 55%)',
               }}
             >
-              <span className="mb-6 block font-display text-5xl text-brand">
-                “
-              </span>
               <p className="font-display text-2xl leading-snug text-text">
                 A system to help you go from blindsided to{' '}
                 <span className="text-brand">back on track.</span>
