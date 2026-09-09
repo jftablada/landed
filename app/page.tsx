@@ -422,45 +422,39 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── What's available today ──────────────────────────── */}
+      {/* ── What the plan does ──────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-5 py-16">
         <h2 className="font-display text-3xl tracking-wide text-text">
-          What’s available today
+          What your plan actually does
         </h2>
+        <p className="mt-3 max-w-2xl leading-relaxed text-muted">
+          Landed turns the details of your situation into a focused plan you
+          can act on now—and update as things change.
+        </p>
         <div className="mt-8 grid gap-5 sm:grid-cols-3">
-          {/* available card — visually stronger */}
-          <div className="rounded-xl border border-brand/40 bg-surface p-6 ring-1 ring-brand/20">
-            <span className="inline-flex w-fit rounded-full bg-brand-soft px-3 py-1 text-xs font-medium text-brand">
-              Available now
-            </span>
-            <h3 className="mt-4 text-lg font-semibold text-text">
-              Recovery Roadmap
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted">
-              Your structured 90-day plan, with check-ins and Canadian context.
-              This is what your founding customer price gets you today.
-            </p>
-          </div>
-
-          {/* in-development cards — quieter */}
           {[
             {
-              name: 'Interview Prep Studio',
-              body: 'Not part of the current sprint. In development.',
+              n: '01',
+              name: 'Shows your financial runway',
+              body: 'See how much room you have based on your available cash and essential monthly costs.',
             },
             {
-              name: 'Contractor-to-Permanent Playbook',
-              body: 'Not part of the current sprint. In development.',
+              n: '02',
+              name: 'Sets this week’s priority',
+              body: 'Get one clear next move and a short checklist instead of an overwhelming list of possibilities.',
+            },
+            {
+              n: '03',
+              name: 'Adapts when things change',
+              body: 'Check in with your job-search progress or financial changes and receive an updated plan.',
             },
           ].map((p) => (
             <div
               key={p.name}
-              className="rounded-xl border border-hair bg-surface/50 p-6"
+              className="rounded-xl border border-hair bg-surface p-6"
             >
-              <span className="inline-flex w-fit rounded-full border border-hair bg-surface-2 px-3 py-1 text-xs font-medium text-muted">
-                In development
-              </span>
-              <h3 className="mt-4 text-lg font-semibold text-muted">
+              <span className="font-display text-2xl text-brand">{p.n}</span>
+              <h3 className="mt-3 text-lg font-semibold text-text">
                 {p.name}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">
