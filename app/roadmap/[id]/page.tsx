@@ -71,7 +71,7 @@ export default async function RoadmapPage({
       <main className="mx-auto w-full max-w-2xl px-5 py-16">
         <div className="mb-8 flex items-center justify-between gap-4">
           <Link href="/start" className="text-sm text-muted hover:text-text">
-            ← Back to command centre
+            ← Back to my home
           </Link>
           <LogoutButton />
         </div>
@@ -102,7 +102,7 @@ export default async function RoadmapPage({
       <main className="mx-auto w-full max-w-2xl px-5 py-16">
         <div className="mb-8 flex items-center justify-between gap-4">
           <Link href="/start" className="text-sm text-muted hover:text-text">
-            ← Back to command centre
+            ← Back to my home
           </Link>
           <LogoutButton />
         </div>
@@ -136,7 +136,7 @@ export default async function RoadmapPage({
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
       <div className="mb-8 flex items-center justify-between gap-4">
         <Link href="/start" className="text-sm text-muted hover:text-text">
-          ← Back to command centre
+          ← Back to my home
         </Link>
         <LogoutButton />
       </div>

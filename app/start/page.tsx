@@ -122,7 +122,7 @@ export default async function StartPage() {
 
       <header className="mt-12 border-b border-hair pb-10">
         <p className="text-sm uppercase tracking-widest text-brand">
-          Your command centre
+          Your home
         </p>
         <div className="mt-3 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
