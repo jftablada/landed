@@ -69,7 +69,10 @@ export default async function RoadmapPage({
   if (!roadmap) {
     return (
       <main className="mx-auto w-full max-w-2xl px-5 py-16">
-        <div className="mb-8 flex justify-end">
+        <div className="mb-8 flex items-center justify-between gap-4">
+          <Link href="/start" className="text-sm text-muted hover:text-text">
+            ← Back to command centre
+          </Link>
           <LogoutButton />
         </div>
 
@@ -97,7 +100,10 @@ export default async function RoadmapPage({
   if (roadmap.blocked) {
     return (
       <main className="mx-auto w-full max-w-2xl px-5 py-16">
-        <div className="mb-8 flex justify-end">
+        <div className="mb-8 flex items-center justify-between gap-4">
+          <Link href="/start" className="text-sm text-muted hover:text-text">
+            ← Back to command centre
+          </Link>
           <LogoutButton />
         </div>
 
@@ -128,7 +134,10 @@ export default async function RoadmapPage({
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
-      <div className="mb-8 flex justify-end">
+      <div className="mb-8 flex items-center justify-between gap-4">
+        <Link href="/start" className="text-sm text-muted hover:text-text">
+          ← Back to command centre
+        </Link>
         <LogoutButton />
       </div>
 
