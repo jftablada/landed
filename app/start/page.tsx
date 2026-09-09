@@ -52,21 +52,21 @@ export default async function StartPage() {
 
   if (!journey) redirect('/intake');
 
-  const { data: roadmap } = await supabase
+  const { data: roadmaps } = await supabase
     .from('roadmaps')
     .select('id, journey_id, blocked, computed_mode, created_at, output_json')
     .eq('user_id', userId)
     .eq('journey_id', journey.id)
     .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(6);
 
+  const roadmap = roadmaps?.[0];
   if (!roadmap) redirect('/intake');
 
   const output = parseOutput(roadmap.output_json);
   const weeklyTasks =
     !roadmap.blocked && output ? deriveWeeklyTasks(output) : [];
-  const [{ data: progress }, { data: latestCheckIn }] = await Promise.all([
+  const [{ data: progress }, { data: checkIns }] = await Promise.all([
     supabase
       .from('roadmap_task_progress')
       .select('task_key, completed')
@@ -75,12 +75,17 @@ export default async function StartPage() {
     supabase
       .from('check_ins')
       .select(
-        'applications_submitted, employer_responses, interviews_secured, offers_received, created_at',
+        'new_roadmap_id, previous_roadmap_id, mode_changed, previous_mode, new_mode, change_summary, applications_submitted, employer_responses, interviews_secured, offers_received, created_at',
       )
-      .eq('new_roadmap_id', roadmap.id)
       .eq('user_id', userId)
-      .maybeSingle(),
+      .in(
+        'new_roadmap_id',
+        (roadmaps ?? []).map((item) => item.id),
+      ),
   ]);
+  const latestCheckIn = checkIns?.find(
+    (checkIn) => checkIn.new_roadmap_id === roadmap.id,
+  );
 
   const completedKeys = new Set(
     (progress ?? [])
@@ -102,6 +107,9 @@ export default async function StartPage() {
   const modeLabel = roadmap.computed_mode
     ? MODE_LABEL[roadmap.computed_mode] ?? roadmap.computed_mode
     : 'Current plan';
+  const checkInByRoadmap = new Map(
+    (checkIns ?? []).map((checkIn) => [checkIn.new_roadmap_id, checkIn]),
+  );
 
   return (
     <main className="mx-auto w-full max-w-5xl px-5 py-10 sm:py-12">
@@ -297,6 +305,88 @@ export default async function StartPage() {
                 Start a check-in
               </Link>
             </div>
+          </section>
+
+          <section className="mt-5 rounded-xl border border-hair bg-surface p-6 sm:p-8">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-widest text-muted">
+                  Recovery timeline
+                </p>
+                <h2 className="mt-2 font-display text-3xl text-text">
+                  How your plan has moved
+                </h2>
+              </div>
+              <p className="text-sm text-muted">
+                {roadmaps?.length ?? 0} saved plan{roadmaps?.length === 1 ? '' : 's'}
+              </p>
+            </div>
+
+            <ol className="mt-7 space-y-0">
+              {(roadmaps ?? []).map((savedRoadmap, index) => {
+                const savedOutput = parseOutput(savedRoadmap.output_json);
+                const transition = checkInByRoadmap.get(savedRoadmap.id);
+                const savedMode = savedRoadmap.computed_mode
+                  ? MODE_LABEL[savedRoadmap.computed_mode] ?? savedRoadmap.computed_mode
+                  : 'Plan paused';
+                const priority = savedRoadmap.blocked
+                  ? 'Waiting for the financial detail needed to complete this plan.'
+                  : savedOutput?.adaptive?.this_weeks_priority ??
+                    savedOutput?.next_move?.action ??
+                    'Open this plan to review its priorities.';
+
+                return (
+                  <li key={savedRoadmap.id} className="relative flex gap-4 pb-7 last:pb-0">
+                    {index < (roadmaps?.length ?? 0) - 1 ? (
+                      <span
+                        aria-hidden
+                        className="absolute left-[11px] top-6 h-full w-px bg-hair"
+                      />
+                    ) : null}
+                    <span
+                      aria-hidden
+                      className={`relative mt-1 h-6 w-6 shrink-0 rounded-full border-4 border-surface ${
+                        index === 0 ? 'bg-brand' : 'bg-surface-2'
+                      }`}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                        <p className="text-sm font-medium text-text">
+                          {index === 0 ? 'Current plan' : savedMode}
+                        </p>
+                        <time className="text-xs text-muted" dateTime={savedRoadmap.created_at}>
+                          {new Date(savedRoadmap.created_at).toLocaleDateString(
+                            'en-CA',
+                            { year: 'numeric', month: 'short', day: 'numeric' },
+                          )}
+                        </time>
+                      </div>
+                      {transition?.mode_changed ? (
+                        <p className="mt-1 text-xs text-brand">
+                          Mode changed from{' '}
+                          {transition.previous_mode
+                            ? MODE_LABEL[transition.previous_mode] ?? transition.previous_mode
+                            : 'the previous plan'}{' '}
+                          to {savedMode}
+                        </p>
+                      ) : index === (roadmaps?.length ?? 0) - 1 &&
+                        !transition?.previous_roadmap_id ? (
+                        <p className="mt-1 text-xs text-muted">Starting baseline</p>
+                      ) : null}
+                      <p className="mt-2 text-sm leading-relaxed text-muted">
+                        {priority}
+                      </p>
+                      <Link
+                        href={`/roadmap/${savedRoadmap.id}`}
+                        className="mt-2 inline-block text-xs text-muted underline underline-offset-4 hover:text-text"
+                      >
+                        View this plan
+                      </Link>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
           </section>
         </>
       )}
