@@ -263,7 +263,7 @@ export default function HomePage() {
         <h2 className="font-display text-3xl tracking-wide text-text">
           What happens after you pay
         </h2>
-        <div className="mt-8 grid gap-5 sm:grid-cols-3">
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
               n: '01',
@@ -272,13 +272,18 @@ export default function HomePage() {
             },
             {
               n: '02',
-              title: 'Founder onboarding within one business day',
-              body: 'A direct welcome, then a personal review of your roadmap once it is generated.',
+              title: 'Create your Landed account',
+              body: 'After checkout, use the same email address to create your account and confirm your email.',
             },
             {
               n: '03',
-              title: 'Complete intake, get your roadmap',
-              body: 'Answer a focused intake and receive your 90-day plan.',
+              title: 'Complete the focused intake',
+              body: 'Start with three quick questions, then add the financial details needed to calculate your runway.',
+            },
+            {
+              n: '04',
+              title: 'Receive your roadmap',
+              body: 'Get your 90-day plan, followed by a personal roadmap review from the founder.',
             },
           ].map((step) => (
             <div
