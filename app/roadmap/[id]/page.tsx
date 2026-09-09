@@ -150,7 +150,7 @@ export default async function RoadmapPage({
         Your plan
       </p>
       {output?.acknowledgment_line && (
-        <h1 className="font-display text-4xl leading-[1.15] mb-8 max-w-xl text-balance">
+        <h1 className="font-display text-4xl leading-[1.15] mb-8 w-full">
           {acknowledgmentParts ? (
             <>
               <span className="block">{acknowledgmentParts[1]}</span>
