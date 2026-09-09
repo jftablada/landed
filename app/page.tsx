@@ -184,22 +184,6 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* CTA */}
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
-              <a
-                href="#free-preview"
-                className="inline-flex w-fit items-center gap-4 rounded-lg bg-brand px-6 py-3.5 text-sm font-semibold text-black transition-opacity hover:opacity-90"
-              >
-                See my free starting point
-                <span aria-hidden>→</span>
-              </a>
-              <div className="text-sm text-muted">
-                <p className="font-medium text-text">
-                  Three quick questions. No signup.
-                </p>
-                <p>Your answers stay in your browser.</p>
-              </div>
-            </div>
           </div>
 
           {/* Right: coded "path forward" panel (abstract, no image) */}
@@ -466,6 +450,55 @@ export default function HomePage() {
                 {p.body}
               </p>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Common questions ────────────────────────────────── */}
+      <section className="mx-auto max-w-3xl px-5 py-16">
+        <p className="text-sm uppercase tracking-widest text-brand">
+          Before you start
+        </p>
+        <h2 className="mt-3 font-display text-3xl tracking-wide text-text">
+          Common questions
+        </h2>
+        <div className="mt-8 divide-y divide-hair border-y border-hair">
+          {[
+            {
+              question: 'Is Landed a job board?',
+              answer:
+                'No. Landed helps you decide what to do next, organize a 90-day recovery plan, and adjust that plan as your situation changes.',
+            },
+            {
+              question: 'Do I need to connect my bank or upload documents?',
+              answer:
+                'No. You enter only the estimates needed to understand your runway. Landed does not ask for bank access or document uploads.',
+            },
+            {
+              question: 'What does the $5 include?',
+              answer:
+                'The one-time founding customer price includes your full roadmap, weekly task tracking, adaptive check-ins, Canadian context, and a personal roadmap review from the founder.',
+            },
+            {
+              question: 'Is this financial, legal, or eligibility advice?',
+              answer:
+                'No. Landed provides general planning information and links to official Canadian resources. Government services and qualified professionals make eligibility, legal, and financial determinations.',
+            },
+          ].map((item) => (
+            <details key={item.question} className="group py-5">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-6 font-semibold text-text">
+                {item.question}
+                <span
+                  aria-hidden
+                  className="text-xl font-normal text-brand transition-transform group-open:rotate-45"
+                >
+                  +
+                </span>
+              </summary>
+              <p className="mt-3 max-w-2xl pr-10 text-sm leading-relaxed text-muted">
+                {item.answer}
+              </p>
+            </details>
           ))}
         </div>
       </section>
