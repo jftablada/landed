@@ -132,6 +132,10 @@ export default async function RoadmapPage({
     ? MODE_LABEL[roadmap.computed_mode] ?? roadmap.computed_mode
     : '—';
 
+  const acknowledgmentParts = output?.acknowledgment_line.match(
+    /^(.*?)\s*(\(until around [^)]+\))\.\s*(.+)$/,
+  );
+
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
       <div className="mb-8 flex items-center justify-between gap-4">
@@ -147,7 +151,15 @@ export default async function RoadmapPage({
       </p>
       {output?.acknowledgment_line && (
         <h1 className="font-display text-4xl leading-[1.15] mb-8 max-w-xl text-balance">
-          {output.acknowledgment_line}
+          {acknowledgmentParts ? (
+            <>
+              <span className="block">{acknowledgmentParts[1]}</span>
+              <span className="mt-1 block">{acknowledgmentParts[2]}</span>
+              <span className="mt-3 block">{acknowledgmentParts[3]}</span>
+            </>
+          ) : (
+            output.acknowledgment_line
+          )}
         </h1>
       )}
 
