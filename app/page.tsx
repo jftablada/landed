@@ -1,7 +1,14 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import HomeMiniIntake from '@/app/components/HomeMiniIntake';
 
 const STRIPE_URL = 'https://buy.stripe.com/00wbITdDtgag2rV9Ez5gc02';
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: '/',
+  },
+};
 
 /* ── Hand-written inline icons (no dependency) ──────────────── */
 const iconProps = {

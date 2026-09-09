@@ -16,9 +16,36 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Landed — your recovery plan",
+  metadataBase: new URL("https://www.getlanded.ca"),
+  title: {
+    default: "Landed | 90-Day Career Recovery Plan",
+    template: "%s | Landed",
+  },
   description:
-    "A structured plan for the first weeks after a layoff or contract ending.",
+    "A focused 90-day recovery plan for Canadians navigating a layoff, contract ending, or career disruption.",
+  applicationName: "Landed",
+  openGraph: {
+    title: "Landed | 90-Day Career Recovery Plan",
+    description:
+      "Get a focused plan, Canadian resources, and clear weekly priorities after a layoff or contract ending.",
+    url: "/",
+    siteName: "Landed",
+    locale: "en_CA",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Landed | 90-Day Career Recovery Plan",
+    description:
+      "A focused 90-day plan for Canadians navigating a layoff, contract ending, or career disruption.",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
