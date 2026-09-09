@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import HomeMiniIntake from '@/app/components/HomeMiniIntake';
+import TrackedCheckoutLink from '@/app/components/TrackedCheckoutLink';
 
 const STRIPE_URL = 'https://buy.stripe.com/00wbITdDtgag2rV9Ez5gc02';
 
@@ -411,12 +412,12 @@ export default function HomePage() {
             ))}
           </ul>
 
-          <a
+          <TrackedCheckoutLink
             href={STRIPE_URL}
             className="mt-8 block rounded-lg bg-brand px-8 py-4 text-center text-base font-semibold text-black transition-opacity hover:opacity-90"
           >
             Start my 90-day recovery
-          </a>
+          </TrackedCheckoutLink>
           <p className="mt-4 text-center text-sm text-muted">
             Secure checkout through Stripe. No subscription. No hidden renewal.
           </p>
@@ -524,12 +525,12 @@ export default function HomePage() {
           Take back control of what’s next.
         </h2>
         <div className="mt-8 flex flex-col items-center gap-3">
-          <a
+          <TrackedCheckoutLink
             href={STRIPE_URL}
             className="inline-block rounded-lg bg-brand px-8 py-4 text-base font-semibold text-black transition-opacity hover:opacity-90"
           >
             Start my 90-day recovery
-          </a>
+          </TrackedCheckoutLink>
           <p className="text-sm text-muted">
           $5 CAD · one-time founding customer price · no subscription
           </p>

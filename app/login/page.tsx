@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
+import { trackEvent } from '@/lib/analytics';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -38,6 +39,7 @@ export default function LoginPage() {
       setStatus(`Couldn’t sign up: ${error.message}`);
       return;
     }
+    trackEvent('account_created');
     if (data.session) {
       setStatus('Account created. Taking you to your plan…');
       router.push('/start');

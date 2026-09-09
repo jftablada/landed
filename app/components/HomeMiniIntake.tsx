@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { trackEvent } from '@/lib/analytics';
 
 type ProvinceCode =
   | 'AB'
@@ -160,6 +161,7 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
     'w-full rounded-lg border border-hair bg-surface-2 px-3 py-3 text-base text-text focus:border-brand focus:outline-none';
 
   function buildStartingPoint() {
+    trackEvent('free_starting_point_generated');
     setShowResult(true);
     window.requestAnimationFrame(() => {
       document
@@ -324,6 +326,7 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
                   </p>
                   <a
                     href={checkoutUrl}
+                    onClick={() => trackEvent('begin_checkout')}
                     className="mt-5 inline-flex rounded-lg bg-brand px-6 py-3 text-sm font-semibold text-black transition-opacity hover:opacity-90"
                   >
                     Build my full 90-day roadmap

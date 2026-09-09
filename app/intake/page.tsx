@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LogoutButton from '@/app/components/LogoutButton';
+import { trackEvent } from '@/lib/analytics';
 
 type ProvinceCode =
   | 'AB'
@@ -151,11 +152,13 @@ export default function IntakePage() {
   const selectedProvince = PROVINCE_RESOURCES[province];
 
   function showResources() {
+    trackEvent('intake_stage_one_completed');
     setError(null);
     setStep('resources');
   }
 
   function showFinancials() {
+    trackEvent('intake_financials_started');
     setError(null);
     setStep('financials');
   }
@@ -230,6 +233,7 @@ export default function IntakePage() {
       if (!intakeRes.ok) {
         throw new Error(intakeData.error || 'Could not save your intake.');
       }
+      trackEvent('intake_submitted');
 
       const genRes = await fetch('/api/roadmap/generate', {
         method: 'POST',
@@ -244,6 +248,7 @@ export default function IntakePage() {
         );
       }
 
+      trackEvent('roadmap_generated');
       router.push(`/roadmap/${genData.roadmap_id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
