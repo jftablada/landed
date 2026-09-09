@@ -75,12 +75,20 @@ export default function HomePage() {
         <span className="font-display text-xl tracking-widest text-text">
           LANDED
         </span>
-        <Link
-          href="/login"
-          className="text-sm text-muted transition-colors hover:text-text"
-        >
-          Sign in
-        </Link>
+        <div className="flex items-center gap-5">
+          <Link
+            href="/about"
+            className="text-sm text-muted transition-colors hover:text-text"
+          >
+            About
+          </Link>
+          <Link
+            href="/login"
+            className="text-sm text-muted transition-colors hover:text-text"
+          >
+            Sign in
+          </Link>
+        </div>
       </nav>
 
       {/* ── Hero ────────────────────────────────────────────── */}
