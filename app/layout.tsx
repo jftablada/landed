@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     type: "website",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Landed | 90-Day Career Recovery Plan",
     description:
       "A focused 90-day plan for Canadians navigating a layoff, contract ending, or career disruption.",
