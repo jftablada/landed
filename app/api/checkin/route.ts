@@ -100,6 +100,7 @@ export async function POST(req: Request) {
     const rawApplicationsSubmitted: unknown = body?.applications_submitted;
     const rawEmployerResponses: unknown = body?.employer_responses;
     const rawInterviewsSecured: unknown = body?.interviews_secured;
+    const rawOffersReceived: unknown = body?.offers_received;
     const rawBiggestBarrier: unknown = body?.biggest_barrier;
 
     if (!journeyId) {
@@ -112,7 +113,8 @@ export async function POST(req: Request) {
     if (
       !isNullableActivityCount(rawApplicationsSubmitted) ||
       !isNullableActivityCount(rawEmployerResponses) ||
-      !isNullableActivityCount(rawInterviewsSecured)
+      !isNullableActivityCount(rawInterviewsSecured) ||
+      !isNullableActivityCount(rawOffersReceived)
     ) {
       return NextResponse.json(
         {
@@ -133,6 +135,7 @@ export async function POST(req: Request) {
     const applicationsSubmitted = rawApplicationsSubmitted ?? null;
     const employerResponses = rawEmployerResponses ?? null;
     const interviewsSecured = rawInterviewsSecured ?? null;
+    const offersReceived = rawOffersReceived ?? null;
     const biggestBarrier = rawBiggestBarrier ?? null;
 
     const supabase = await createSupabaseServerClient();
@@ -254,6 +257,7 @@ export async function POST(req: Request) {
         applicationsSubmitted,
         employerResponses,
         interviewsSecured,
+        offersReceived,
         biggestBarrier,
       },
       { db, ai: templateStubClient, systemPrompt: SYSTEM_PROMPT },

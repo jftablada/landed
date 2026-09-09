@@ -27,6 +27,16 @@ drop function if exists public.insert_roadmap_and_checkin(
   uuid, boolean, text, text, text
 );
 
+drop function if exists public.insert_roadmap_and_checkin(
+  uuid, uuid, uuid, text, numeric, date, numeric, text, boolean, text, jsonb,
+  uuid, boolean, text, text, text, integer, integer, integer, text
+);
+
+drop function if exists public.insert_roadmap_and_checkin(
+  uuid, uuid, uuid, text, numeric, date, numeric, text, boolean, text, jsonb,
+  uuid, boolean, text, text, text, integer, integer, integer, integer, text
+);
+
 create or replace function public.insert_roadmap_and_checkin(
   -- roadmap fields
   p_intake_id       uuid,
@@ -49,6 +59,7 @@ create or replace function public.insert_roadmap_and_checkin(
   p_applications_submitted integer default null,
   p_employer_responses     integer default null,
   p_interviews_secured     integer default null,
+  p_offers_received        integer default null,
   p_biggest_barrier        text default null
 )
 returns jsonb
@@ -119,12 +130,12 @@ begin
     journey_id, user_id,
     previous_roadmap_id, new_roadmap_id,
     mode_changed, previous_mode, new_mode, change_summary,
-    applications_submitted, employer_responses, interviews_secured, biggest_barrier
+    applications_submitted, employer_responses, interviews_secured, offers_received, biggest_barrier
   ) values (
     p_journey_id, p_user_id,
     p_previous_roadmap_id, v_new_roadmap_id,
     p_mode_changed, p_previous_mode, p_new_mode, p_change_summary,
-    p_applications_submitted, p_employer_responses, p_interviews_secured, p_biggest_barrier
+    p_applications_submitted, p_employer_responses, p_interviews_secured, p_offers_received, p_biggest_barrier
   )
   returning id into v_new_checkin_id;
 
@@ -166,12 +177,12 @@ $$;
 -- scope every call to the authenticated owner.
 grant execute on function public.insert_roadmap_and_checkin(
   uuid, uuid, uuid, text, numeric, date, numeric, text, boolean, text, jsonb,
-  uuid, boolean, text, text, text, integer, integer, integer, text
+  uuid, boolean, text, text, text, integer, integer, integer, integer, text
 ) to public;
 
 grant execute on function public.insert_roadmap_and_checkin(
   uuid, uuid, uuid, text, numeric, date, numeric, text, boolean, text, jsonb,
-  uuid, boolean, text, text, text, integer, integer, integer, text
+  uuid, boolean, text, text, text, integer, integer, integer, integer, text
 ) to authenticated;
 
 commit;

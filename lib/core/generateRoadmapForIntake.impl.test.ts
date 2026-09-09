@@ -229,6 +229,7 @@ describe('happy path', () => {
         applicationsSubmitted: 20,
         employerResponses: 3,
         interviewsSecured: 0,
+        offersReceived: 0,
         biggestBarrier: 'Something else',
       },
       deps(db, fakeAi([GOOD_AI_JSON])),
@@ -265,6 +266,7 @@ describe('check-in activity persistence', () => {
         applicationsSubmitted: 7,
         employerResponses: 2,
         interviewsSecured: 1,
+        offersReceived: 1,
         biggestBarrier: 'Motivation/energy',
       },
       deps(db, fakeAi([GOOD_AI_JSON])),
@@ -274,6 +276,7 @@ describe('check-in activity persistence', () => {
       applications_submitted: 7,
       employer_responses: 2,
       interviews_secured: 1,
+      offers_received: 1,
       biggest_barrier: 'Motivation/energy',
     });
   });
@@ -290,6 +293,7 @@ describe('check-in activity persistence', () => {
       applications_submitted: null,
       employer_responses: null,
       interviews_secured: null,
+      offers_received: null,
       biggest_barrier: null,
     });
   });

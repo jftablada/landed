@@ -31,6 +31,7 @@ export default function CheckinClient() {
   const [applicationsSubmitted, setApplicationsSubmitted] = useState('');
   const [employerResponses, setEmployerResponses] = useState('');
   const [interviewsSecured, setInterviewsSecured] = useState('');
+  const [offersReceived, setOffersReceived] = useState('');
   const [biggestBarrier, setBiggestBarrier] = useState('');
 
   const labelCls = 'text-muted text-sm';
@@ -116,6 +117,7 @@ export default function CheckinClient() {
     const applicationsSubmittedNumber = Number(applicationsSubmitted);
     const employerResponsesNumber = Number(employerResponses);
     const interviewsSecuredNumber = Number(interviewsSecured);
+    const offersReceivedNumber = Number(offersReceived);
 
     if (
       applicationsSubmitted === '' ||
@@ -141,6 +143,15 @@ export default function CheckinClient() {
       interviewsSecuredNumber < 0
     ) {
       setError('Enter interviews secured as a whole number.');
+      return;
+    }
+
+    if (
+      offersReceived === '' ||
+      !Number.isInteger(offersReceivedNumber) ||
+      offersReceivedNumber < 0
+    ) {
+      setError('Enter offers received as a whole number.');
       return;
     }
 
@@ -186,6 +197,7 @@ export default function CheckinClient() {
           applications_submitted: applicationsSubmittedNumber,
           employer_responses: employerResponsesNumber,
           interviews_secured: interviewsSecuredNumber,
+          offers_received: offersReceivedNumber,
           biggest_barrier: biggestBarrier,
         }),
       });
@@ -285,6 +297,21 @@ export default function CheckinClient() {
             step="1"
             value={interviewsSecured}
             onChange={(e) => setInterviewsSecured(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className={labelCls} htmlFor="offers-received">
+            How many job offers did you receive since your last check-in?
+          </label>
+          <input
+            id="offers-received"
+            className={fieldCls}
+            type="number"
+            min="0"
+            step="1"
+            value={offersReceived}
+            onChange={(e) => setOffersReceived(e.target.value)}
           />
         </div>
 

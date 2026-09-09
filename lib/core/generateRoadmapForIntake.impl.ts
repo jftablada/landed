@@ -94,6 +94,7 @@ export interface CheckInInsert {
   applications_submitted: number | null;
   employer_responses: number | null;
   interviews_secured: number | null;
+  offers_received: number | null;
   biggest_barrier: string | null;
 }
 
@@ -210,6 +211,7 @@ export async function generateRoadmapForIntake(
         applications_submitted: opts.applicationsSubmitted ?? null,
         employer_responses: opts.employerResponses ?? null,
         interviews_secured: opts.interviewsSecured ?? null,
+        offers_received: opts.offersReceived ?? null,
         biggest_barrier: opts.biggestBarrier ?? null,
       }),
     );
@@ -276,6 +278,7 @@ export async function generateRoadmapForIntake(
       applicationsSubmitted: opts.applicationsSubmitted,
       employerResponses: opts.employerResponses,
       interviewsSecured: opts.interviewsSecured,
+      offersReceived: opts.offersReceived,
       biggestBarrier: opts.biggestBarrier,
       elapsedDays,
       previousMode,
@@ -318,6 +321,7 @@ export async function generateRoadmapForIntake(
       applications_submitted: opts.applicationsSubmitted ?? null,
       employer_responses: opts.employerResponses ?? null,
       interviews_secured: opts.interviewsSecured ?? null,
+      offers_received: opts.offersReceived ?? null,
       biggest_barrier: opts.biggestBarrier ?? null,
     }),
   );

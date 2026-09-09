@@ -199,6 +199,9 @@ create table check_ins (
   applications_submitted integer,
   employer_responses     integer,
   interviews_secured     integer,
+  offers_received        integer
+    constraint check_ins_offers_received_range
+    check (offers_received is null or offers_received between 0 and 10000),
   biggest_barrier        text
 );
 

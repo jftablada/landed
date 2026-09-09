@@ -9,6 +9,7 @@ function input(overrides: Partial<AdaptiveRuleInput> = {}): AdaptiveRuleInput {
     applicationsSubmitted: 20,
     employerResponses: 2,
     interviewsSecured: 0,
+    offersReceived: 0,
     biggestBarrier: 'Something else',
     elapsedDays: 14,
     previousMode: 'balanced',
@@ -20,6 +21,20 @@ function input(overrides: Partial<AdaptiveRuleInput> = {}): AdaptiveRuleInput {
 describe('buildAdaptivePayload', () => {
   it('returns null when the activity report is incomplete', () => {
     expect(buildAdaptivePayload(input({ employerResponses: null }))).toBeNull();
+  });
+
+  it('prioritizes an offer over every other signal', () => {
+    const result = buildAdaptivePayload(
+      input({
+        offersReceived: 1,
+        interviewsSecured: 4,
+        previousMode: 'strategic',
+        currentMode: 'survival',
+      }),
+    );
+
+    expect(result?.rule_fired).toBe('offer_received');
+    expect(result?.what_changed).toContain('1 offer');
   });
 
   it('prioritizes financial deterioration over every activity signal', () => {

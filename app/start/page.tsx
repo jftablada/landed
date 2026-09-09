@@ -75,7 +75,7 @@ export default async function StartPage() {
     supabase
       .from('check_ins')
       .select(
-        'applications_submitted, employer_responses, interviews_secured, created_at',
+        'applications_submitted, employer_responses, interviews_secured, offers_received, created_at',
       )
       .eq('new_roadmap_id', roadmap.id)
       .eq('user_id', userId)
@@ -97,7 +97,8 @@ export default async function StartPage() {
   const hasActivity =
     latestCheckIn?.applications_submitted != null ||
     latestCheckIn?.employer_responses != null ||
-    latestCheckIn?.interviews_secured != null;
+    latestCheckIn?.interviews_secured != null ||
+    latestCheckIn?.offers_received != null;
   const modeLabel = roadmap.computed_mode
     ? MODE_LABEL[roadmap.computed_mode] ?? roadmap.computed_mode
     : 'Current plan';
@@ -227,11 +228,12 @@ export default async function StartPage() {
                 </Link>
               </div>
               {hasActivity ? (
-                <div className="mt-6 grid grid-cols-3 gap-3 text-center">
+                <div className="mt-6 grid grid-cols-2 gap-3 text-center sm:grid-cols-4">
                   {[
                     ['Applications', latestCheckIn?.applications_submitted ?? 0],
                     ['Responses', latestCheckIn?.employer_responses ?? 0],
                     ['Interviews', latestCheckIn?.interviews_secured ?? 0],
+                    ['Offers', latestCheckIn?.offers_received ?? 0],
                   ].map(([label, value]) => (
                     <div key={label} className="rounded-lg bg-surface-2 px-2 py-4">
                       <p className="font-display text-3xl text-text">{value}</p>

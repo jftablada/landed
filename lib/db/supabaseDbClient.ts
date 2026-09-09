@@ -147,6 +147,7 @@ export function createSupabaseDbClient(
         p_applications_submitted: ci.applications_submitted,
         p_employer_responses: ci.employer_responses,
         p_interviews_secured: ci.interviews_secured,
+        p_offers_received: ci.offers_received,
         p_biggest_barrier: ci.biggest_barrier,
       });
 

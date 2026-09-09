@@ -69,6 +69,7 @@ export interface GenerateOptions {
   applicationsSubmitted?: number | null;
   employerResponses?: number | null;
   interviewsSecured?: number | null;
+  offersReceived?: number | null;
   biggestBarrier?: string | null;
 }
 

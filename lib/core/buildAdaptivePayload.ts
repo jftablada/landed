@@ -5,6 +5,7 @@ export interface AdaptiveRuleInput {
   applicationsSubmitted: number | null | undefined;
   employerResponses: number | null | undefined;
   interviewsSecured: number | null | undefined;
+  offersReceived: number | null | undefined;
   biggestBarrier: string | null | undefined;
   elapsedDays: number;
   previousMode: Mode | null;
@@ -48,6 +49,7 @@ export function buildAdaptivePayload(
     applicationsSubmitted,
     employerResponses,
     interviewsSecured,
+    offersReceived,
     biggestBarrier,
     elapsedDays,
     previousMode,
@@ -58,6 +60,7 @@ export function buildAdaptivePayload(
     applicationsSubmitted == null ||
     employerResponses == null ||
     interviewsSecured == null ||
+    offersReceived == null ||
     biggestBarrier == null
   ) {
     return null;
@@ -68,6 +71,20 @@ export function buildAdaptivePayload(
     employerResponses,
     interviewsSecured,
   );
+
+  if (offersReceived >= 1) {
+    return {
+      what_changed: `${whatChanged} You received ${offersReceived} offer${offersReceived === 1 ? '' : 's'}.`,
+      what_this_suggests:
+        'You have moved from generating opportunities to evaluating a concrete option.',
+      this_weeks_priority:
+        'Review the offer carefully against your financial needs, role goals, and any deadlines before deciding.',
+      why:
+        'An offer changes the immediate decision in front of you, so evaluating it deserves priority over increasing application volume.',
+      rule_fired: 'offer_received',
+      diagnosis_withheld: false,
+    };
+  }
 
   if (
     previousMode !== null &&
