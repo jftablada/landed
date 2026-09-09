@@ -187,17 +187,17 @@ export default function HomePage() {
             {/* CTA */}
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
               <a
-                href={STRIPE_URL}
+                href="#free-preview"
                 className="inline-flex w-fit items-center gap-4 rounded-lg bg-brand px-6 py-3.5 text-sm font-semibold text-black transition-opacity hover:opacity-90"
               >
-                Start my 90-day recovery
+                See my free starting point
                 <span aria-hidden>→</span>
               </a>
               <div className="text-sm text-muted">
-              <p className="font-medium text-text">
-                One-time founding customer price.
+                <p className="font-medium text-text">
+                  Three quick questions. No signup.
                 </p>
-                <p>Secure checkout through Stripe. No subscription.</p>
+                <p>Your answers stay in your browser.</p>
               </div>
             </div>
           </div>
