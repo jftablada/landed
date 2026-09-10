@@ -9,6 +9,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import LogoutButton from '@/app/components/LogoutButton';
 import WeeklyTasksClient from './WeeklyTasksClient';
+import ExploreRunway from './ExploreRunway';
 import type { AdaptivePayload } from '@/lib/core/generateRoadmapForIntake';
 import {
   getAuthedUserId,
@@ -90,7 +91,7 @@ export default async function RoadmapPage({
   const { data: intake } = await supabase
     .from('intakes')
     .select(
-      'province, employment_type, housing_type, confirmed_cash, essential_burn, ei_status, source, created_at',
+      'province, employment_type, housing_type, confirmed_cash, essential_burn, tax_obligation_status, tax_obligation_amount, tax_plan_monthly, ei_status, ei_monthly_amount, source, created_at',
     )
     .eq('id', roadmap.intake_id)
     .eq('user_id', userId)
@@ -196,6 +197,29 @@ export default async function RoadmapPage({
           </p>
         )}
       </section>
+
+      {intake && (
+        <ExploreRunway
+          baselineCash={Math.max(
+            0,
+            Number(intake.confirmed_cash) -
+              (intake.tax_obligation_status === 'has_amount'
+                ? Number(intake.tax_obligation_amount ?? 0)
+                : 0),
+          )}
+          baselineMonthlyCosts={
+            Number(intake.essential_burn) +
+            (intake.tax_obligation_status === 'on_plan'
+              ? Number(intake.tax_plan_monthly ?? 0)
+              : 0)
+          }
+          baselineMonthlyIncome={
+            intake.ei_status === 'receiving'
+              ? Number(intake.ei_monthly_amount ?? 0)
+              : 0
+          }
+        />
+      )}
 
       {/* Adaptive check-in — present only on activity-aware roadmaps */}
       {output?.adaptive ? (
