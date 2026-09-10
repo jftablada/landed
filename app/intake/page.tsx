@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LogoutButton from '@/app/components/LogoutButton';
 import { trackEvent } from '@/lib/analytics';
+import OnboardingProgress from '@/app/components/OnboardingProgress';
 
 type ProvinceCode =
   | 'AB'
@@ -279,8 +280,12 @@ export default function IntakePage() {
 
       {step === 'start' && (
         <>
+          <OnboardingProgress
+            currentStep={3}
+            detail="About one minute. Nothing is saved until your financial details are complete."
+          />
           <p className="text-muted text-sm uppercase tracking-widest mb-2">
-            Step 1 of 2
+            Your starting point
           </p>
           <h1 className="font-display text-4xl leading-tight mb-2 max-w-md text-balance">
             Start with what happened
@@ -345,6 +350,10 @@ export default function IntakePage() {
 
       {step === 'resources' && (
         <>
+          <OnboardingProgress
+            currentStep={3}
+            detail="Your starting point is ready. Continue when you’re comfortable adding the details for your full plan."
+          />
           <p className="text-muted text-sm uppercase tracking-widest mb-2">
             Your starting point
           </p>
@@ -444,8 +453,16 @@ export default function IntakePage() {
 
       {step === 'financials' && (
         <>
+          <OnboardingProgress
+            currentStep={submitting ? 5 : 4}
+            detail={
+              submitting
+                ? 'Your details are saved. Landed is building your roadmap now.'
+                : 'About three minutes. Reasonable estimates are enough to build your starting plan.'
+            }
+          />
           <p className="text-muted text-sm uppercase tracking-widest mb-2">
-            Step 2 of 2
+            {submitting ? 'Building your roadmap' : 'Your financial picture'}
           </p>
           <h1 className="font-display text-4xl leading-tight mb-2 max-w-md text-balance">
             Build your full roadmap

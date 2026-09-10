@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import { trackEvent } from '@/lib/analytics';
+import OnboardingProgress from '@/app/components/OnboardingProgress';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -80,6 +81,12 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto w-full max-w-sm px-5 py-20">
+      {arrivedFromCheckout && (
+        <OnboardingProgress
+          currentStep={2}
+          detail="Payment is complete. Account setup usually takes about two minutes."
+        />
+      )}
       <p className="text-muted text-sm uppercase tracking-widest mb-2">Landed</p>
       <h1 className="font-display text-4xl leading-tight mb-2 max-w-xs text-balance">
         {arrivedFromCheckout ? 'Payment received. Let’s get you started.' : 'You just got the call. Now what?'}
