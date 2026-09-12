@@ -25,6 +25,7 @@ import {
 } from '@/lib/core/generateRoadmapForIntake.impl';
 import { templateStubClient } from '@/lib/ai/templateStubClient';
 import { SYSTEM_PROMPT } from '@/lib/ai/systemPrompt';
+import { isCanadianProvinceCode } from '@/lib/core/canadianProvinces';
 
 // The 17 carry-forward fields — everything on intakes EXCEPT the
 // db-managed columns (id, journey_id, user_id, created_at, source).
@@ -200,13 +201,18 @@ export async function POST(req: Request) {
     if (
       !merged.employment_type ||
       !merged.housing_type ||
-      !merged.province ||
       merged.confirmed_cash == null ||
       merged.essential_burn == null ||
       !taxStatus
     ) {
       return NextResponse.json(
         { error: 'Merged intake is missing required fields' },
+        { status: 400 },
+      );
+    }
+    if (!isCanadianProvinceCode(merged.province)) {
+      return NextResponse.json(
+        { error: 'province must be a supported Canadian province or territory' },
         { status: 400 },
       );
     }

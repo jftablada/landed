@@ -166,6 +166,15 @@ Checklist:
 
 ---
 
+## Product Follow-Ups
+
+- [x] Let users update their province during check-in
+  - Prefill the field with the province from their latest intake.
+  - Use the selected province when generating the new roadmap and provincial resources.
+  - Preserve prior roadmaps and their original province as immutable history.
+
+---
+
 ## Deferred — Do Not Touch Yet
 
 These are intentionally deferred. Do not build or suggest unless the roadmap says otherwise.
@@ -193,4 +202,3 @@ These are intentionally deferred. Do not build or suggest unless the roadmap say
 - Money-back copy removed because the founding customer price is intentionally low.
 - Buyer-facing copy should emphasize one-time payment, no subscription, and no hidden renewal.
 - Founder onboarding within one business day is a public promise and must be honored.
-

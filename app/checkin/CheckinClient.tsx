@@ -5,6 +5,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import LogoutButton from '@/app/components/LogoutButton';
+import {
+  CANADIAN_PROVINCES,
+  isCanadianProvinceCode,
+} from '@/lib/core/canadianProvinces';
 
 export default function CheckinClient() {
   const router = useRouter();
@@ -16,6 +20,7 @@ export default function CheckinClient() {
   const [error, setError] = useState<string | null>(null);
 
   const [original, setOriginal] = useState<{
+    province: string;
     confirmedCash: string;
     essentialBurn: string;
     debtMinimums: string;
@@ -24,6 +29,7 @@ export default function CheckinClient() {
   } | null>(null);
 
   const [confirmedCash, setConfirmedCash] = useState('');
+  const [province, setProvince] = useState('');
   const [essentialBurn, setEssentialBurn] = useState('');
   const [debtMinimums, setDebtMinimums] = useState('0');
   const [eiStatus, setEiStatus] = useState('not_applied');
@@ -56,6 +62,7 @@ export default function CheckinClient() {
         }
 
         const loaded = {
+          province: String(data.province ?? ''),
           confirmedCash: String(data.confirmed_cash ?? ''),
           essentialBurn: String(data.essential_burn ?? ''),
           debtMinimums: String(data.debt_minimums ?? '0'),
@@ -68,6 +75,7 @@ export default function CheckinClient() {
         };
 
         setOriginal(loaded);
+        setProvince(loaded.province);
         setConfirmedCash(loaded.confirmedCash);
         setEssentialBurn(loaded.essentialBurn);
         setDebtMinimums(loaded.debtMinimums);
@@ -93,6 +101,11 @@ export default function CheckinClient() {
 
     if (!original) {
       setError('Your current plan has not loaded yet.');
+      return;
+    }
+
+    if (!isCanadianProvinceCode(province)) {
+      setError('Choose your province or territory.');
       return;
     }
 
@@ -161,6 +174,10 @@ export default function CheckinClient() {
     }
 
     const changes: Record<string, number | string | null> = {};
+
+    if (province !== original.province) {
+      changes.province = province;
+    }
 
     if (confirmedCash !== original.confirmedCash) {
       changes.confirmed_cash = Number(confirmedCash);
@@ -348,6 +365,32 @@ export default function CheckinClient() {
             </option>
             <option value="Something else">Something else</option>
           </select>
+        </div>
+
+        <h2 className="pt-4 font-display text-2xl text-text">
+          Your details
+        </h2>
+
+        <div className="flex flex-col gap-1.5">
+          <label className={labelCls} htmlFor="province">
+            Province or territory
+          </label>
+          <select
+            id="province"
+            className={fieldCls}
+            value={province}
+            onChange={(e) => setProvince(e.target.value)}
+          >
+            <option value="">Select one</option>
+            {CANADIAN_PROVINCES.map(({ code, name }) => (
+              <option key={code} value={code}>
+                {name}
+              </option>
+            ))}
+          </select>
+          <p className="text-muted text-xs">
+            Used for provincial resources and your updated plan.
+          </p>
         </div>
 
         <h2 className="pt-4 font-display text-2xl text-text">
