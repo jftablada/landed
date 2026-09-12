@@ -2,6 +2,14 @@
 
 import { useState } from 'react';
 import { trackEvent } from '@/lib/analytics';
+import {
+  getThisWeekLinks,
+  getTodayActions,
+  SITUATION_FRAMING,
+  SITUATION_LABELS,
+  type EmploymentType,
+  type SituationType,
+} from '@/lib/core/freeStartingPoint';
 
 type ProvinceCode =
   | 'AB'
@@ -18,21 +26,11 @@ type ProvinceCode =
   | 'SK'
   | 'YT';
 
-type SituationType = 'laid_off' | 'non_renewal' | 'contract_ending' | 'pivot';
-type EmploymentType = 'employee' | 'sole_proprietor' | 'incorporated';
-
 interface ProvinceResources {
   name: string;
   employmentStandardsUrl: string;
   employmentServicesUrl: string;
 }
-
-const FEDERAL_RESOURCES = {
-  eiApplicationUrl:
-    'https://www.canada.ca/en/services/benefits/ei/ei-regular-benefit/apply.html',
-  roeInformationUrl:
-    'https://www.canada.ca/en/employment-social-development/programs/ei/ei-list/ei-roe.html',
-};
 
 const PROVINCE_RESOURCES: Record<ProvinceCode, ProvinceResources> = {
   AB: {
@@ -117,33 +115,6 @@ const PROVINCES = Object.entries(PROVINCE_RESOURCES) as Array<
   [ProvinceCode, ProvinceResources]
 >;
 
-const SITUATION_LABELS: Record<SituationType, string> = {
-  laid_off: 'I was laid off',
-  non_renewal: 'My contract wasn’t renewed',
-  contract_ending: 'My contract is ending soon',
-  pivot: 'I’m changing careers',
-};
-
-function getPriorities(
-  situation: SituationType,
-  employmentType: EmploymentType,
-): string[] {
-  const workEnding = situation !== 'pivot';
-  const first =
-    employmentType === 'employee'
-      ? 'Confirm your final pay details and when your Record of Employment will be issued.'
-      : 'Review your contract, outstanding invoices, and the date your current income ends.';
-  const second = workEnding
-    ? 'Check the official benefit and employment-standard links below before making assumptions about eligibility.'
-    : 'Define the role direction you are moving toward before broadening your search.';
-
-  return [
-    first,
-    second,
-    'Write down your available cash and essential monthly costs—the full roadmap uses them to calculate your runway.',
-  ];
-}
-
 interface HomeMiniIntakeProps {
   checkoutUrl: string;
 }
@@ -156,7 +127,8 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
   const [showResult, setShowResult] = useState(false);
 
   const selectedProvince = PROVINCE_RESOURCES[province];
-  const priorities = getPriorities(situation, employmentType);
+  const todayActions = getTodayActions(employmentType);
+  const thisWeekLinks = getThisWeekLinks(employmentType);
   const fieldClass =
     'w-full rounded-lg border border-hair bg-surface-2 px-3 py-3 text-base text-text focus:border-brand focus:outline-none';
 
@@ -183,7 +155,7 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
               Free starting point
             </p>
             <h2 className="mt-3 font-display text-4xl leading-tight text-text sm:text-5xl">
-              See your first three moves.
+              See your first steps.
             </h2>
             <p className="mt-4 max-w-md leading-relaxed text-muted">
               Answer three quick questions for a private, Canadian starting
@@ -267,62 +239,129 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
             ) : (
               <div id="free-starting-point" className="scroll-mt-6" aria-live="polite">
                 <p className="text-sm uppercase tracking-widest text-brand">
-                  Your starting point
+                  Your first steps
                 </p>
                 <h3 className="mt-2 font-display text-3xl text-text">
-                  Three moves to make first
+                  A clearer place to begin
                 </h3>
                 <p className="mt-2 text-sm text-muted">
                   Based on “{SITUATION_LABELS[situation]}” in {selectedProvince.name}.
                 </p>
+                <p className="mt-4 text-sm leading-relaxed text-text">
+                  {SITUATION_FRAMING[situation]}
+                </p>
 
-                <ol className="mt-6 space-y-4">
-                  {priorities.map((priority, index) => (
-                    <li key={priority} className="flex gap-4">
+                <section className="mt-8 border-t border-hair pt-6">
+                  <p className="text-xs uppercase tracking-widest text-brand">
+                    Today
+                  </p>
+                  <h4 className="mt-2 font-display text-2xl text-text">
+                    Get the immediate facts together
+                  </h4>
+                  <ol className="mt-4 space-y-4">
+                    {todayActions.map((action, index) => (
+                      <li key={action} className="flex gap-4">
                       <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-soft text-sm font-semibold text-brand">
                         {index + 1}
                       </span>
                       <span className="pt-0.5 text-sm leading-relaxed text-text">
-                        {priority}
+                        {action}
                       </span>
-                    </li>
-                  ))}
-                </ol>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
 
-                <div className="mt-8 border-t border-hair pt-6">
-                  <h4 className="font-semibold text-text">Official places to check</h4>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    {[
-                      ['EI application', FEDERAL_RESOURCES.eiApplicationUrl],
-                      ['Record of Employment', FEDERAL_RESOURCES.roeInformationUrl],
-                      [`${selectedProvince.name} employment standards`, selectedProvince.employmentStandardsUrl],
-                      [`${selectedProvince.name} employment services`, selectedProvince.employmentServicesUrl],
-                    ].map(([label, url]) => (
+                <section className="mt-8 border-t border-hair pt-6">
+                  <p className="text-xs uppercase tracking-widest text-brand">
+                    This week
+                  </p>
+                  <h4 className="mt-2 font-display text-2xl text-text">
+                    Check the federal information in order
+                  </h4>
+                  <div className="mt-4 space-y-3">
+                    {thisWeekLinks.map(({ label, description, url }, index) => (
                       <a
                         key={label}
                         href={url}
                         target="_blank"
                         rel="noreferrer"
-                        className="rounded-lg border border-hair bg-surface-2 px-4 py-3 text-sm text-text transition-colors hover:border-brand"
+                        className="flex gap-4 rounded-lg border border-hair bg-surface-2 px-4 py-4 transition-colors hover:border-brand"
                       >
-                        {label} <span aria-hidden className="text-brand">↗</span>
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-brand/40 text-sm font-semibold text-brand">
+                          {index + 1}
+                        </span>
+                        <span>
+                          <span className="block text-sm font-medium text-text">
+                            {label} <span aria-hidden className="text-brand">↗</span>
+                          </span>
+                          <span className="mt-1 block text-xs leading-relaxed text-muted">
+                            {description}
+                          </span>
+                        </span>
                       </a>
                     ))}
                   </div>
-                  <p className="mt-4 text-xs leading-relaxed text-muted">
-                    General information only—not legal, financial, or eligibility
-                    advice. The responsible government service makes eligibility
-                    decisions.
+                </section>
+
+                <section className="mt-8 border-t border-hair pt-6">
+                  <p className="text-xs uppercase tracking-widest text-brand">
+                    Your province
                   </p>
-                </div>
+                  <h4 className="mt-2 font-display text-2xl text-text">
+                    Official {selectedProvince.name} resources
+                  </h4>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    {[
+                      {
+                        label: 'Employment standards',
+                        description:
+                          'Official information on workplace rights and employer obligations.',
+                        url: selectedProvince.employmentStandardsUrl,
+                      },
+                      {
+                        label: 'Employment services',
+                        description:
+                          'Government-supported job-search, career, and training services.',
+                        url: selectedProvince.employmentServicesUrl,
+                      },
+                    ].map(({ label, description, url }) => (
+                      <a
+                        key={label}
+                        href={url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-lg border border-hair bg-surface-2 px-4 py-4 transition-colors hover:border-brand"
+                      >
+                        <span className="block text-sm font-medium text-text">
+                          {label} <span aria-hidden className="text-brand">↗</span>
+                        </span>
+                        <span className="mt-1 block text-xs leading-relaxed text-muted">
+                          {description}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                </section>
+
+                <p className="mt-6 text-xs leading-relaxed text-muted">
+                  General information only—not legal, financial, tax, benefits,
+                  or eligibility advice. The responsible government service
+                  determines what applies to your situation.
+                </p>
 
                 <div className="mt-8 rounded-xl border border-brand/30 bg-brand-soft/20 p-5">
+                  <p className="text-xs uppercase tracking-widest text-brand">
+                    What Landed adds
+                  </p>
                   <h4 className="font-display text-2xl text-text">
-                    Turn this into a complete 90-day plan
+                    Turn official information into your plan
                   </h4>
                   <p className="mt-2 text-sm leading-relaxed text-muted">
-                    The full roadmap calculates your financial runway, orders
-                    your next actions by urgency, and adapts through check-ins.
+                    This free starting point shows what to investigate. The full
+                    roadmap uses your cash, monthly costs, obligations, and
+                    confirmed support to calculate your runway, order your next
+                    actions, and adapt through check-ins.
                   </p>
                   <a
                     href={checkoutUrl}
