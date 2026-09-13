@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  estimateRoughRunwayWeeks,
+  formatRoughRunway,
   getThisWeekLinks,
   getTodayActions,
   SITUATION_FRAMING,
@@ -50,5 +52,21 @@ describe('free starting point', () => {
         true,
       );
     }
+  });
+
+  it('estimates rough cash runway in weeks without assigning a mode', () => {
+    expect(estimateRoughRunwayWeeks(6000, 3000)).toBeCloseTo(8.69, 2);
+    expect(formatRoughRunway(8.69)).toBe('about 9 weeks');
+  });
+
+  it('handles short runway without displaying zero weeks', () => {
+    expect(formatRoughRunway(0)).toBe('less than a day');
+    expect(formatRoughRunway(0.5)).toBe('about 3 days');
+  });
+
+  it('rejects invalid rough runway inputs', () => {
+    expect(estimateRoughRunwayWeeks(-1, 3000)).toBeNull();
+    expect(estimateRoughRunwayWeeks(6000, 0)).toBeNull();
+    expect(estimateRoughRunwayWeeks(Number.NaN, 3000)).toBeNull();
   });
 });

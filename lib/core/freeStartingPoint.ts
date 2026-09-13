@@ -101,3 +101,31 @@ export function getThisWeekLinks(
     ? EMPLOYEE_WEEK_LINKS
     : SELF_EMPLOYED_WEEK_LINKS;
 }
+
+export function estimateRoughRunwayWeeks(
+  availableCash: number,
+  essentialMonthlyCosts: number,
+): number | null {
+  if (
+    !Number.isFinite(availableCash) ||
+    !Number.isFinite(essentialMonthlyCosts) ||
+    availableCash < 0 ||
+    essentialMonthlyCosts <= 0
+  ) {
+    return null;
+  }
+
+  return (availableCash / essentialMonthlyCosts) * WEEKS_PER_MONTH;
+}
+
+export function formatRoughRunway(weeks: number): string {
+  const days = Math.floor(Math.max(0, weeks) * 7);
+
+  if (days < 1) return 'less than a day';
+  if (days === 1) return 'about 1 day';
+  if (days < 7) return `about ${days} days`;
+
+  const roundedWeeks = weeks < 4 ? weeks.toFixed(1) : Math.round(weeks).toString();
+  return `about ${roundedWeeks} ${roundedWeeks === '1.0' ? 'week' : 'weeks'}`;
+}
+import { WEEKS_PER_MONTH } from './computeMode';

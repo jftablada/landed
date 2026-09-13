@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { trackEvent } from '@/lib/analytics';
 import {
+  estimateRoughRunwayWeeks,
+  formatRoughRunway,
   getThisWeekLinks,
   getTodayActions,
   SITUATION_FRAMING,
@@ -125,6 +127,10 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
   const [employmentType, setEmploymentType] =
     useState<EmploymentType>('employee');
   const [showResult, setShowResult] = useState(false);
+  const [roughCash, setRoughCash] = useState('');
+  const [roughMonthlyCosts, setRoughMonthlyCosts] = useState('');
+  const [roughRunwayWeeks, setRoughRunwayWeeks] = useState<number | null>(null);
+  const [roughRunwayError, setRoughRunwayError] = useState<string | null>(null);
 
   const selectedProvince = PROVINCE_RESOURCES[province];
   const todayActions = getTodayActions(employmentType);
@@ -144,6 +150,43 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
 
   function resetPreview() {
     setShowResult(false);
+    setRoughCash('');
+    setRoughMonthlyCosts('');
+    setRoughRunwayWeeks(null);
+    setRoughRunwayError(null);
+  }
+
+  function updateRoughInput(
+    setter: (value: string) => void,
+    value: string,
+  ) {
+    setter(value);
+    setRoughRunwayWeeks(null);
+    setRoughRunwayError(null);
+  }
+
+  function calculateRoughRunway() {
+    const cash = Number(roughCash);
+    const monthlyCosts = Number(roughMonthlyCosts);
+    const estimate = estimateRoughRunwayWeeks(cash, monthlyCosts);
+
+    if (roughCash === '' || cash < 0 || !Number.isFinite(cash)) {
+      setRoughRunwayError('Enter the cash you have available today.');
+      return;
+    }
+    if (
+      roughMonthlyCosts === '' ||
+      monthlyCosts <= 0 ||
+      !Number.isFinite(monthlyCosts) ||
+      estimate === null
+    ) {
+      setRoughRunwayError('Enter monthly essential costs greater than $0.');
+      return;
+    }
+
+    setRoughRunwayError(null);
+    setRoughRunwayWeeks(estimate);
+    trackEvent('free_runway_estimated');
   }
 
   return (
@@ -363,6 +406,82 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
                     confirmed support to calculate your runway, order your next
                     actions, and adapt through check-ins.
                   </p>
+
+                  <div className="mt-5 rounded-lg border border-hair bg-surface-2 p-4">
+                    <p className="text-sm font-medium text-text">
+                      Try a rough cash-runway check
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted">
+                      Use cash available today and essential monthly costs. The
+                      estimate stays in your browser and is not saved.
+                    </p>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <label className="text-xs text-muted">
+                        Available cash ($)
+                        <input
+                          type="number"
+                          min="0"
+                          step="100"
+                          inputMode="decimal"
+                          value={roughCash}
+                          onChange={(event) =>
+                            updateRoughInput(setRoughCash, event.target.value)
+                          }
+                          className="mt-1.5 w-full rounded-lg border border-hair bg-surface px-3 py-2.5 text-base text-text focus:border-brand focus:outline-none"
+                        />
+                      </label>
+                      <label className="text-xs text-muted">
+                        Essential monthly costs ($)
+                        <input
+                          type="number"
+                          min="1"
+                          step="100"
+                          inputMode="decimal"
+                          value={roughMonthlyCosts}
+                          onChange={(event) =>
+                            updateRoughInput(
+                              setRoughMonthlyCosts,
+                              event.target.value,
+                            )
+                          }
+                          className="mt-1.5 w-full rounded-lg border border-hair bg-surface px-3 py-2.5 text-base text-text focus:border-brand focus:outline-none"
+                        />
+                      </label>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={calculateRoughRunway}
+                      className="mt-4 rounded-lg border border-brand px-4 py-2.5 text-sm font-semibold text-brand transition-colors hover:bg-brand-soft/30"
+                    >
+                      Estimate my rough runway
+                    </button>
+
+                    {roughRunwayError && (
+                      <p className="mt-3 text-sm text-red-400">
+                        {roughRunwayError}
+                      </p>
+                    )}
+
+                    {roughRunwayWeeks !== null && (
+                      <div className="mt-4 border-t border-hair pt-4" aria-live="polite">
+                        <p className="text-xs uppercase tracking-widest text-muted">
+                          Rough cash runway
+                        </p>
+                        <p className="mt-1 font-display text-4xl text-brand">
+                          {formatRoughRunway(roughRunwayWeeks)}
+                        </p>
+                        <p className="mt-2 text-xs leading-relaxed text-muted">
+                          Cash divided by essential monthly costs. This does not
+                          include income, EI, taxes, debt payments, pending
+                          invoices, or other obligations unless you included
+                          them in the numbers above.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
                   <a
                     href={checkoutUrl}
                     onClick={() => trackEvent('begin_checkout')}
