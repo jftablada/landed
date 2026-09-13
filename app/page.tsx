@@ -302,78 +302,88 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Roadmap preview (signature coded card) ──────────── */}
+      {/* ── Roadmap preview ─────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-5 py-16">
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div>
+            <p className="text-sm uppercase tracking-widest text-brand">
+              Inside the paid roadmap
+            </p>
             <h2 className="font-display text-3xl tracking-wide text-text">
-              What your 90 days look like
+              See enough to know what you’re getting
             </h2>
             <p className="mt-4 max-w-md text-muted">
-              Your plan adapts to your situation and updates as you check in.
-              This is the shape it follows — not a fixed script, a moving plan.
+              This sample shows the shape of a Landed roadmap. Your complete
+              priorities, task sequence, financial context, and adaptive
+              check-ins stay private to your account.
             </p>
           </div>
 
-          {/* coded dashboard-style preview */}
-          <div className="overflow-hidden rounded-2xl border border-hair bg-surface">
+          <div className="overflow-hidden rounded-2xl border border-hair bg-surface shadow-2xl shadow-black/20">
             <div className="flex items-center justify-between border-b border-hair px-5 py-3">
               <span className="text-sm font-semibold text-text">
-                Your 90-Day Roadmap
+                Sample roadmap
               </span>
-              <span className="flex gap-1.5" aria-hidden>
-                <span className="h-2.5 w-2.5 rounded-full bg-surface-2" />
-                <span className="h-2.5 w-2.5 rounded-full bg-surface-2" />
-                <span className="h-2.5 w-2.5 rounded-full bg-brand-soft" />
+              <span className="rounded-full border border-hair bg-surface-2 px-3 py-1 text-xs text-muted">
+                Example only
               </span>
             </div>
-            <div className="divide-y divide-hair">
-              {[
-                {
-                  phase: 'Stabilize',
-                  days: 'First week',
-                  body: 'Steady your cash, sort EI/ROE, ease immediate pressure.',
-                  active: true,
-                },
-                {
-                  phase: 'Focus',
-                  days: 'Weeks 2–4',
-                  body: 'Narrow your search, tighten your story, start outreach.',
-                  active: false,
-                },
-                {
-                  phase: 'Momentum',
-                  days: 'Weeks 5–12',
-                  body: 'Keep opportunities moving, track interviews, adjust weekly.',
-                  active: false,
-                },
-              ].map((row) => (
-                <div
-                  key={row.phase}
-                  className="flex items-start gap-4 px-5 py-4"
-                >
-                  <span
-                    className={`mt-1 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
-                      row.active
-                        ? 'bg-brand text-black'
-                        : 'bg-surface-2 text-muted'
-                    }`}
-                  >
-                    ✓
+            <div className="p-5 sm:p-6">
+              <div className="rounded-xl border border-hair bg-surface-2 p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-widest text-muted">
+                      This week’s priority
+                    </p>
+                    <p className="mt-2 text-lg font-semibold text-text">
+                      Get the immediate facts in one place
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-brand-soft px-3 py-1 text-xs font-medium text-brand">
+                    Stabilize
                   </span>
-                  <div className="flex-1">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <p className="font-semibold text-text">{row.phase}</p>
-                      <span className="text-xs uppercase tracking-widest text-muted">
-                        {row.days}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm leading-relaxed text-muted">
-                      {row.body}
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-muted">
+                  Reduce uncertainty before making bigger career or financial
+                  decisions.
+                </p>
+              </div>
+
+              <div className="mt-4 rounded-xl border border-hair p-4">
+                <p className="text-xs uppercase tracking-widest text-muted">
+                  First task
+                </p>
+                <div className="mt-3 flex items-start gap-3">
+                  <span
+                    aria-hidden
+                    className="mt-0.5 h-5 w-5 flex-shrink-0 rounded border border-muted"
+                  />
+                  <p className="text-sm leading-relaxed text-text">
+                    Confirm your final pay date, benefits end date, and whether
+                    your ROE has been issued.
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative mt-4 overflow-hidden rounded-xl border border-hair bg-surface-2 p-4">
+                <div aria-hidden className="select-none space-y-3 opacity-25 blur-[3px]">
+                  <div className="h-3 w-28 rounded bg-muted" />
+                  <div className="h-4 w-full rounded bg-muted" />
+                  <div className="h-4 w-4/5 rounded bg-muted" />
+                  <div className="h-4 w-11/12 rounded bg-muted" />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center bg-surface/55 px-5 text-center">
+                  <div>
+                    <p className="text-sm font-semibold text-text">
+                      Your remaining tasks and reasoning are personalized
+                    </p>
+                    <p className="mt-1 text-xs text-muted">
+                      Unlock the full sequence, runway context, and adaptive
+                      check-ins.
                     </p>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
