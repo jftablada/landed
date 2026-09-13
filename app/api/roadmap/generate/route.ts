@@ -24,6 +24,7 @@ import {
 } from '@/lib/core/generateRoadmapForIntake.impl';
 import { templateStubClient } from '@/lib/ai/templateStubClient';
 import { SYSTEM_PROMPT } from '@/lib/ai/systemPrompt';
+import { hasLandedAccess, PAYMENT_REQUIRED_RESPONSE } from '@/lib/billing/entitlement';
 
 export async function POST(req: Request) {
   try {
@@ -45,6 +46,9 @@ export async function POST(req: Request) {
 
     // ── 3. dependencies ───────────────────────────────────────────────
     const supabase = await createSupabaseServerClient();
+    if (!(await hasLandedAccess(supabase))) {
+      return NextResponse.json(PAYMENT_REQUIRED_RESPONSE, { status: 402 });
+    }
     console.log('ROADMAP ROUTE userId:', userId);
     const db = createSupabaseDbClient(supabase, userId);
 

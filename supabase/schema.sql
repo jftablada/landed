@@ -237,6 +237,28 @@ create table roadmap_task_progress (
 create index idx_roadmap_task_progress_user
   on roadmap_task_progress(user_id, roadmap_id);
 
+-- ────────────────────────────────────────────────────────────────────
+-- purchase_entitlements — server-written Stripe fulfillment records.
+-- Clients never read this table directly; has_landed_access() exposes
+-- only the boolean needed to gate paid product creation.
+-- ────────────────────────────────────────────────────────────────────
+create table purchase_entitlements (
+  id uuid primary key default gen_random_uuid(),
+  email text not null,
+  stripe_checkout_session_id text not null unique,
+  stripe_payment_link_id text not null,
+  payment_status text not null,
+  amount_total integer,
+  currency text,
+  purchased_at timestamptz not null,
+  created_at timestamptz not null default now(),
+  constraint purchase_entitlements_email_normalized
+    check (email = lower(trim(email)))
+);
+
+create index idx_purchase_entitlements_email
+  on purchase_entitlements(email);
+
 -- ════════════════════════════════════════════════════════════════════
 -- ROW LEVEL SECURITY
 -- Every table holds user-owned financial data. Lock all access to the
@@ -250,9 +272,32 @@ alter table burn_items enable row level security;
 alter table roadmaps   enable row level security;
 alter table check_ins  enable row level security;
 alter table roadmap_task_progress enable row level security;
+alter table purchase_entitlements enable row level security;
 
 revoke all on table roadmap_task_progress from anon;
 grant select, insert, update on table roadmap_task_progress to authenticated;
+revoke all on table purchase_entitlements from anon, authenticated;
+
+create or replace function has_landed_access()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public, pg_catalog
+as $$
+  select
+    exists (
+      select 1 from public.purchase_entitlements
+      where email = lower(trim(coalesce(auth.jwt() ->> 'email', '')))
+        and payment_status <> 'unpaid'
+    )
+    or exists (
+      select 1 from public.intakes where user_id = auth.uid()
+    );
+$$;
+
+revoke all on function has_landed_access() from public, anon;
+grant execute on function has_landed_access() to authenticated;
 
 -- profiles: a user sees and edits only their own profile row.
 create policy profiles_select on profiles

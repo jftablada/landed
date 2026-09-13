@@ -26,6 +26,7 @@ import {
 import { templateStubClient } from '@/lib/ai/templateStubClient';
 import { SYSTEM_PROMPT } from '@/lib/ai/systemPrompt';
 import { isCanadianProvinceCode } from '@/lib/core/canadianProvinces';
+import { hasLandedAccess, PAYMENT_REQUIRED_RESPONSE } from '@/lib/billing/entitlement';
 
 // The 17 carry-forward fields — everything on intakes EXCEPT the
 // db-managed columns (id, journey_id, user_id, created_at, source).
@@ -140,6 +141,9 @@ export async function POST(req: Request) {
     const biggestBarrier = rawBiggestBarrier ?? null;
 
     const supabase = await createSupabaseServerClient();
+    if (!(await hasLandedAccess(supabase))) {
+      return NextResponse.json(PAYMENT_REQUIRED_RESPONSE, { status: 402 });
+    }
 
     // ── 3. verify journey: exists, owned, active ──────────────────────
     const { data: journey, error: journeyErr } = await supabase

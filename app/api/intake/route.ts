@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAuthedUserId, createSupabaseServerClient } from '@/lib/supabase/server';
+import { hasLandedAccess, PAYMENT_REQUIRED_RESPONSE } from '@/lib/billing/entitlement';
 
 export async function POST(req: Request) {
   try {
@@ -11,6 +12,9 @@ export async function POST(req: Request) {
       );
     }
     const supabase = await createSupabaseServerClient();
+    if (!(await hasLandedAccess(supabase))) {
+      return NextResponse.json(PAYMENT_REQUIRED_RESPONSE, { status: 402 });
+    }
     const body = await req.json();
 
     const {
