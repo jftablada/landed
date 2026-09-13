@@ -1,5 +1,6 @@
 export type SituationType =
   | 'laid_off'
+  | 'dismissed'
   | 'non_renewal'
   | 'contract_ending'
   | 'pivot';
@@ -17,6 +18,7 @@ export interface StartingPointLink {
 
 export const SITUATION_LABELS: Record<SituationType, string> = {
   laid_off: 'I was laid off',
+  dismissed: 'I was dismissed or fired',
   non_renewal: 'My contract wasn’t renewed',
   contract_ending: 'My contract is ending soon',
   pivot: 'I’m changing careers',
@@ -25,6 +27,8 @@ export const SITUATION_LABELS: Record<SituationType, string> = {
 export const SITUATION_FRAMING: Record<SituationType, string> = {
   laid_off:
     'A layoff can make everything feel urgent. Start by getting the facts, documents, and official information in one place.',
+  dismissed:
+    'Being dismissed can leave you with urgent questions. Start by recording what happened, preserving the documents you received, and reviewing official information before drawing conclusions about what applies.',
   non_renewal:
     'A non-renewal creates a clear transition point. Start by confirming the dates, documents, and money already in motion.',
   contract_ending:

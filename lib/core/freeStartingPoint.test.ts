@@ -11,10 +11,20 @@ describe('free starting point', () => {
   it('keeps situation input limited to framing', () => {
     expect(Object.keys(SITUATION_FRAMING)).toEqual([
       'laid_off',
+      'dismissed',
       'non_renewal',
       'contract_ending',
       'pivot',
     ]);
+  });
+
+  it('frames dismissal without making legal or benefits conclusions', () => {
+    const framing = SITUATION_FRAMING.dismissed.toLowerCase();
+
+    expect(framing).toContain('official information');
+    expect(framing).not.toContain('wrongful dismissal');
+    expect(framing).not.toContain('you qualify');
+    expect(framing).not.toContain('you are eligible');
   });
 
   it('gives each employment type three concrete actions for today', () => {
