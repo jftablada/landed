@@ -39,6 +39,14 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
+::selection { background: var(--brand-soft); color: var(--text); }
+
+button, a, summary { -webkit-tap-highlight-color: transparent; }
+
+@media (prefers-reduced-motion: no-preference) {
+  button, a, summary { transition-duration: 180ms; transition-timing-function: ease-out; }
+}
+
 /* Bebas Neue is all-caps and tall; give display headings breathing room. */
 .font-display {
   font-family: var(--font-display), Arial, sans-serif;

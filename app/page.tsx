@@ -266,32 +266,27 @@ export default function HomePage() {
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
-              n: '01',
               title: 'Pay securely through Stripe',
               body: 'One-time $5 CAD founding customer price. No subscription, nothing to cancel later.',
             },
             {
-              n: '02',
               title: 'Create your Landed account',
               body: 'After checkout, use the same email address to create your account and confirm your email.',
             },
             {
-              n: '03',
               title: 'Complete the focused intake',
               body: 'Start with three quick questions, then add the financial details needed to calculate your runway.',
             },
             {
-              n: '04',
               title: 'Receive your roadmap',
               body: 'Get your 90-day plan, followed by a personal roadmap review from the founder.',
             },
           ].map((step) => (
             <div
-              key={step.n}
+              key={step.title}
               className="rounded-xl border border-hair bg-surface p-6"
             >
-              <span className="font-display text-2xl text-brand">{step.n}</span>
-              <h3 className="mt-3 text-lg font-semibold text-text">
+              <h3 className="text-lg font-semibold text-text">
                 {step.title}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">

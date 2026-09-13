@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import LogoutButton from '@/app/components/LogoutButton';
+import AuthenticatedNav from '@/app/components/AuthenticatedNav';
+import DisclosureSection from '@/app/components/DisclosureSection';
 import { deriveWeeklyTasks } from '@/lib/core/deriveWeeklyTasks';
 import type { RoadmapOutput } from '@/lib/core/generateRoadmapForIntake';
 import {
@@ -113,14 +114,9 @@ export default async function StartPage() {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-5 py-10 sm:py-12">
-      <div className="flex items-center justify-between gap-4">
-        <Link href="/" className="font-display text-xl tracking-widest text-text">
-          LANDED
-        </Link>
-        <LogoutButton />
-      </div>
+      <AuthenticatedNav roadmapId={roadmap.id} />
 
-      <header className="mt-12 border-b border-hair pb-10">
+      <header className="mt-14 pb-8">
         <p className="text-sm uppercase tracking-widest text-brand">
           Your home
         </p>
@@ -133,12 +129,6 @@ export default async function StartPage() {
               {updateLabel(roadmap.created_at)} · {modeLabel}
             </p>
           </div>
-          <Link
-            href={`/roadmap/${roadmap.id}`}
-            className="w-fit text-sm text-muted underline underline-offset-4 hover:text-text"
-          >
-            View full roadmap →
-          </Link>
         </div>
       </header>
 
@@ -163,12 +153,12 @@ export default async function StartPage() {
         </section>
       ) : (
         <>
-          <section className="mt-8 grid gap-5 lg:grid-cols-[1.3fr_0.7fr]">
-            <div className="rounded-xl border border-brand/30 bg-surface p-6 sm:p-8">
+          <section className="mt-8">
+            <div className="rounded-2xl bg-surface p-7 shadow-[0_22px_70px_rgba(0,0,0,0.24)] sm:p-10">
               <p className="text-sm uppercase tracking-widest text-brand">
                 Your next move
               </p>
-              <h2 className="mt-3 text-2xl leading-snug text-text">
+              <h2 className="mt-4 max-w-3xl text-3xl leading-snug text-text sm:text-4xl">
                 {nextTask?.label ??
                   output?.next_move?.action ??
                   'Review your roadmap and choose one useful action.'}
@@ -189,13 +179,26 @@ export default async function StartPage() {
               ) : null}
               <Link
                 href={`/roadmap/${roadmap.id}#weekly-tasks-heading`}
-                className="mt-7 inline-block rounded-lg bg-brand px-5 py-3 font-medium text-black"
+                className="mt-8 inline-block rounded-xl bg-brand px-6 py-3.5 font-semibold text-black hover:opacity-90"
               >
                 {weeklyTasks.length ? 'Open this week’s tasks' : 'Open my roadmap'}
               </Link>
             </div>
+          </section>
 
-            <div className="rounded-xl border border-hair bg-surface p-6 sm:p-8">
+          <section className="mt-6 rounded-2xl bg-surface px-6 py-5" aria-label="This week's progress">
+            <div className="flex items-center justify-between gap-4 text-sm">
+              <span className="font-medium text-text">This week</span>
+              <span className="text-muted">{completedCount} of {weeklyTasks.length} complete</span>
+            </div>
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface-2">
+              <div className="h-full rounded-full bg-brand" style={{ width: `${completionPercent}%` }} />
+            </div>
+          </section>
+
+          <div className="mt-10 space-y-4">
+          <DisclosureSection eyebrow="Your context" title="Financial runway" summary="Your current room to move, kept out of the way until you need it.">
+            <div>
               <p className="text-sm uppercase tracking-widest text-muted">
                 Current runway
               </p>
@@ -215,9 +218,10 @@ export default async function StartPage() {
               ) : null}
               <p className="mt-5 text-sm text-muted">{modeLabel}</p>
             </div>
-          </section>
+          </DisclosureSection>
 
-          <section className="mt-5 grid gap-5 md:grid-cols-2">
+          <DisclosureSection eyebrow="Progress" title="Job-search pulse" summary="Your latest activity and how the plan is responding.">
+          <section className="grid gap-5 md:grid-cols-2">
             <div className="rounded-xl border border-hair bg-surface p-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -283,8 +287,9 @@ export default async function StartPage() {
               )}
             </div>
           </section>
+          </DisclosureSection>
 
-          <section className="mt-5 rounded-xl border border-hair bg-surface p-6">
+          <section className="rounded-2xl bg-surface p-6 sm:p-8">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm uppercase tracking-widest text-muted">
@@ -307,7 +312,8 @@ export default async function StartPage() {
             </div>
           </section>
 
-          <section className="mt-5 rounded-xl border border-hair bg-surface p-6 sm:p-8">
+          <DisclosureSection id="progress" eyebrow="History" title="Recovery timeline" summary={`${roadmaps?.length ?? 0} saved plan${roadmaps?.length === 1 ? '' : 's'}`}>
+          <section>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-sm uppercase tracking-widest text-muted">
@@ -388,6 +394,8 @@ export default async function StartPage() {
               })}
             </ol>
           </section>
+          </DisclosureSection>
+          </div>
         </>
       )}
 

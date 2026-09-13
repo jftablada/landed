@@ -8,6 +8,8 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import LogoutButton from '@/app/components/LogoutButton';
+import AuthenticatedNav from '@/app/components/AuthenticatedNav';
+import DisclosureSection from '@/app/components/DisclosureSection';
 import WeeklyTasksClient from './WeeklyTasksClient';
 import ExploreRunway from './ExploreRunway';
 import type { AdaptivePayload } from '@/lib/core/generateRoadmapForIntake';
@@ -138,16 +140,11 @@ export default async function RoadmapPage({
   );
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-5 py-12">
-      <div className="mb-8 flex items-center justify-between gap-4">
-        <Link href="/start" className="text-sm text-muted hover:text-text">
-          ← Back to my home
-        </Link>
-        <LogoutButton />
-      </div>
+    <main className="mx-auto w-full max-w-3xl px-5 py-10 sm:py-12">
+      <AuthenticatedNav roadmapId={roadmap.id} />
 
       {/* Header */}
-      <p className="text-muted text-sm uppercase tracking-widest mb-2">
+      <p className="mt-14 text-muted text-sm uppercase tracking-widest mb-2">
         Your plan
       </p>
       {output?.acknowledgment_line && (
@@ -164,8 +161,27 @@ export default async function RoadmapPage({
         </h1>
       )}
 
+      {output?.next_move && (
+        <section className="mb-10 rounded-2xl bg-surface p-7 shadow-[0_22px_70px_rgba(0,0,0,0.24)] sm:p-9">
+          <p className="text-xs uppercase tracking-[0.18em] text-brand">Your next move</p>
+          <h2 className="mt-3 text-3xl leading-snug text-text">{output.next_move.action}</h2>
+          <p className="mt-4 max-w-2xl leading-relaxed text-muted">{output.next_move.why_first}</p>
+          {output.next_move.boundary_note ? <p className="mt-3 text-sm italic text-muted">{output.next_move.boundary_note}</p> : null}
+          <a href="#weekly-tasks-heading" className="mt-7 inline-block rounded-xl bg-brand px-6 py-3.5 font-semibold text-black hover:opacity-90">Open this week’s actions</a>
+        </section>
+      )}
+
+      <WeeklyTasksClient roadmapId={roadmap.id} />
+
+      <div className="space-y-4">
+        <DisclosureSection
+          eyebrow="Your context"
+          title="Financial runway"
+          summary="The numbers behind your current room to move."
+        >
+
       {/* Runway — the focal card */}
-      <section className="rounded-xl border border-hair bg-surface p-6 mb-12">
+      <section className="rounded-xl bg-surface-2 p-6">
         <div className="flex items-center justify-between mb-4">
           <span className="text-muted text-sm uppercase tracking-widest">
             Where you stand
@@ -220,11 +236,17 @@ export default async function RoadmapPage({
           }
         />
       )}
+        </DisclosureSection>
 
       {/* Adaptive check-in — present only on activity-aware roadmaps */}
       {output?.adaptive ? (
+        <DisclosureSection
+          eyebrow="Progress"
+          title="Since your last check-in"
+          summary={output.adaptive.what_changed}
+        >
         <section
-          className={`rounded-xl border bg-surface p-6 mb-12 ${
+          className={`rounded-xl bg-surface-2 p-6 ${
             output.adaptive.diagnosis_withheld
               ? 'border-hair'
               : 'border-brand-soft'
@@ -262,13 +284,17 @@ export default async function RoadmapPage({
             </div>
           </div>
         </section>
+        </DisclosureSection>
       ) : null}
-
-      <WeeklyTasksClient roadmapId={roadmap.id} />
 
       {/* Pressure points */}
       {output?.pressure_points?.length ? (
-        <section className="mb-12">
+        <DisclosureSection
+          eyebrow="Strategy"
+          title="What your plan is built around"
+          summary="The pressures shaping your current priorities."
+        >
+        <section>
           <h2 className="text-muted text-sm uppercase tracking-widest mb-3">
             What your plan is built around
           </h2>
@@ -276,39 +302,25 @@ export default async function RoadmapPage({
             {output.pressure_points.map((p, i) => (
               <li
                 key={i}
-                className="rounded-lg border border-hair bg-surface px-4 py-3 text-text"
+                className="rounded-xl bg-surface-2 px-4 py-3 text-text"
               >
                 {p}
               </li>
             ))}
           </ul>
         </section>
+        </DisclosureSection>
       ) : null}
 
       {/* Next move — emphasized */}
-      {output?.next_move && (
-        <section className="mb-12">
-          <h2 className="text-muted text-sm uppercase tracking-widest mb-3">
-            Your next move
-          </h2>
-          <div className="rounded-xl border border-brand-soft bg-surface p-6">
-            <p className="text-xl text-text mb-3">{output.next_move.action}</p>
-            <p className="text-muted">
-              <span className="text-brand">Why this first: </span>
-              {output.next_move.why_first}
-            </p>
-            {output.next_move.boundary_note && (
-              <p className="text-muted text-sm mt-3 italic">
-                {output.next_move.boundary_note}
-              </p>
-            )}
-          </div>
-        </section>
-      )}
-
       {/* Phases */}
       {output?.roadmap?.show && output.roadmap.phases?.length ? (
-        <section className="mb-12">
+        <DisclosureSection
+          eyebrow="Your plan"
+          title="30-day roadmap"
+          summary="Open the full sequence when you’re ready to look beyond this week."
+        >
+        <section>
           <h2 className="text-muted text-sm uppercase tracking-widest mb-3">
             Your 30-day roadmap
           </h2>
@@ -316,7 +328,7 @@ export default async function RoadmapPage({
             {output.roadmap.phases.map((phase, i) => (
               <div
                 key={i}
-                className="rounded-lg border border-hair bg-surface p-5"
+                className="rounded-xl bg-surface-2 p-5"
               >
                 <p className="font-display text-2xl mb-2">{phase.title}</p>
                 <ul className="space-y-1.5">
@@ -331,15 +343,21 @@ export default async function RoadmapPage({
             ))}
           </div>
         </section>
+        </DisclosureSection>
       ) : null}
 
       {/* Linked intake */}
       {intake && (
-        <section className="mb-12">
+        <DisclosureSection
+          eyebrow="Details"
+          title="What this plan is based on"
+          summary="Your latest location and financial snapshot."
+        >
+        <section>
           <h2 className="text-muted text-sm uppercase tracking-widest mb-3">
             Based on
           </h2>
-          <div className="rounded-lg border border-hair bg-surface p-5 grid grid-cols-2 gap-y-2 text-sm">
+          <div className="grid grid-cols-2 gap-y-2 rounded-xl bg-surface-2 p-5 text-sm">
             <span className="text-muted">Province</span>
             <span className="text-text">{intake.province}</span>
             <span className="text-muted">Cash on hand</span>
@@ -350,10 +368,12 @@ export default async function RoadmapPage({
             <span className="text-text">{intake.ei_status}</span>
           </div>
         </section>
+        </DisclosureSection>
       )}
+      </div>
 
       {/* Check-in CTA */}
-      <section className="rounded-xl border border-hair bg-surface p-6">
+      <section className="mt-10 rounded-2xl bg-surface p-7 sm:p-8">
         <h2 className="font-display text-2xl mb-1">Something changed?</h2>
         <p className="text-muted mb-4">
           If your finances have shifted, do a check-in and we’ll update your

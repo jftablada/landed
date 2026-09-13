@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import LogoutButton from '@/app/components/LogoutButton';
+import AuthenticatedNav from '@/app/components/AuthenticatedNav';
 import {
   CANADIAN_PROVINCES,
   isCanadianProvinceCode,
@@ -241,21 +241,10 @@ export default function CheckinClient() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-xl px-5 py-12">
-      <div className="mb-8 flex justify-end">
-        <LogoutButton />
-      </div>
+    <main className="mx-auto w-full max-w-3xl px-5 py-10 sm:py-12">
+      <AuthenticatedNav />
 
-      <div className="mb-6">
-        <a
-          href="/start"
-          className="text-sm text-muted hover:text-text transition-colors"
-        >
-          ← Back to my plan
-        </a>
-      </div>
-
-      <p className="text-muted text-sm uppercase tracking-widest mb-2">
+      <p className="mt-14 text-muted text-sm uppercase tracking-widest mb-2">
         Check in
       </p>
 
@@ -263,12 +252,12 @@ export default function CheckinClient() {
         What changed?
       </h1>
 
-      <p className="text-muted mb-10">
+      <p className="max-w-xl text-muted mb-10">
         Tell us what happened in your search, then update any financial details
         that changed.
       </p>
 
-      <div className="space-y-5">
+      <div className="max-w-xl space-y-6">
         <h2 className="font-display text-2xl text-text">Your job search</h2>
 
         <div className="flex flex-col gap-1.5">
@@ -367,9 +356,17 @@ export default function CheckinClient() {
           </select>
         </div>
 
-        <h2 className="pt-4 font-display text-2xl text-text">
-          Your details
-        </h2>
+        <details className="group mt-10 overflow-hidden rounded-2xl bg-surface shadow-[0_18px_55px_rgba(0,0,0,0.16)]">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 hover:bg-surface-2/50">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-muted">Optional update</p>
+              <h2 className="mt-1 font-display text-2xl text-text">Financial details</h2>
+              <p className="mt-1 text-sm text-muted">Open only if your province, cash, costs, debt, or EI changed.</p>
+            </div>
+            <span aria-hidden className="text-xl text-brand transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <div className="space-y-5 border-t border-hair px-6 py-6">
+            <h3 className="font-display text-xl text-text">Your details</h3>
 
         <div className="flex flex-col gap-1.5">
           <label className={labelCls} htmlFor="province">
@@ -393,9 +390,9 @@ export default function CheckinClient() {
           </p>
         </div>
 
-        <h2 className="pt-4 font-display text-2xl text-text">
+        <h3 className="pt-4 font-display text-xl text-text">
           Your financial situation
-        </h2>
+        </h3>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
@@ -470,6 +467,8 @@ export default function CheckinClient() {
             />
           </div>
         )}
+          </div>
+        </details>
 
         {error && <p className="text-red-400 text-sm">{error}</p>}
 

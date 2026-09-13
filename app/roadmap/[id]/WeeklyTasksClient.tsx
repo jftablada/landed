@@ -142,15 +142,15 @@ export default function WeeklyTasksClient({
         </p>
       </div>
 
-      <div className="rounded-xl border border-hair bg-surface divide-y divide-hair">
+      <div className="divide-y divide-hair/70 overflow-hidden rounded-2xl bg-surface shadow-[0_18px_55px_rgba(0,0,0,0.16)]">
         {tasks.map((task) => {
           const pending = pendingKeys.has(task.key);
 
           return (
             <label
               key={task.key}
-              className={`flex items-start gap-3 px-4 py-4 ${
-                pending ? 'opacity-60' : 'cursor-pointer'
+              className={`flex items-start gap-3 px-5 py-5 transition-colors ${
+                pending ? 'opacity-60' : 'cursor-pointer hover:bg-surface-2/50'
               }`}
             >
               <input
