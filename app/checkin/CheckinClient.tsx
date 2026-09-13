@@ -222,7 +222,9 @@ export default function CheckinClient() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Could not update your plan.');
+        throw new Error(
+          data.message || data.error || 'Could not update your plan.',
+        );
       }
 
       router.push(`/roadmap/${data.roadmap_id}`);

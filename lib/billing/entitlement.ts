@@ -10,5 +10,6 @@ export async function hasLandedAccess(
 
 export const PAYMENT_REQUIRED_RESPONSE = {
   error: 'payment_required',
-  message: 'A completed Landed purchase is required to build a roadmap.',
+  message:
+    "We don't see a Landed purchase for this email. If you paid with a different address, email hello@getlanded.ca and I'll link it manually.",
 };

@@ -232,7 +232,9 @@ export default function IntakePage() {
 
       const intakeData = await intakeRes.json();
       if (!intakeRes.ok) {
-        throw new Error(intakeData.error || 'Could not save your intake.');
+        throw new Error(
+          intakeData.message || intakeData.error || 'Could not save your intake.',
+        );
       }
       trackEvent('intake_submitted');
 
