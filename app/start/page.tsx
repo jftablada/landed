@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 
 import AuthenticatedNav from '@/app/components/AuthenticatedNav';
 import DisclosureSection from '@/app/components/DisclosureSection';
+import { hasLandedAccess } from '@/lib/billing/entitlement';
+import { resolveStartAccessState } from '@/lib/billing/startAccess';
 import { deriveWeeklyTasks } from '@/lib/core/deriveWeeklyTasks';
 import type { RoadmapOutput } from '@/lib/core/generateRoadmapForIntake';
 import {
@@ -42,6 +44,7 @@ export default async function StartPage() {
   if (!userId) redirect('/login');
 
   const supabase = await createSupabaseServerClient();
+  const hasAccess = await hasLandedAccess(supabase);
   const { data: journey } = await supabase
     .from('journeys')
     .select('id')
@@ -50,6 +53,82 @@ export default async function StartPage() {
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
+
+  const accessState = resolveStartAccessState(hasAccess, Boolean(journey));
+
+  if (accessState === 'missing_purchase') {
+    return (
+      <main className="mx-auto w-full max-w-3xl px-5 py-10 sm:py-12">
+        <AuthenticatedNav />
+
+        <section className="mt-14 rounded-2xl bg-surface p-7 shadow-[0_22px_70px_rgba(0,0,0,0.24)] sm:p-10">
+          <p className="text-sm uppercase tracking-widest text-brand">
+            Access check
+          </p>
+          <h1 className="mt-4 max-w-2xl font-display text-4xl leading-tight text-text sm:text-5xl">
+            Let’s connect your purchase.
+          </h1>
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted">
+            We don’t see a Landed purchase for the email on this account. This
+            usually means checkout used a different email address.
+          </p>
+
+          <div className="mt-8 rounded-xl bg-surface-2 p-5 sm:p-6">
+            <p className="font-medium text-text">Already paid?</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted">
+              Email us from either address and include the email you used at
+              checkout. Never send your password or card information.
+            </p>
+            <a
+              href="mailto:hello@getlanded.ca?subject=Connect%20my%20Landed%20purchase"
+              className="mt-5 inline-block rounded-xl bg-brand px-6 py-3.5 font-semibold text-black hover:opacity-90"
+            >
+              Email Landed support
+            </a>
+          </div>
+
+          <p className="mt-6 text-sm leading-relaxed text-muted">
+            Haven’t purchased yet?{' '}
+            <Link href="/" className="text-text underline underline-offset-4">
+              Return to the Landed overview
+            </Link>
+            .
+          </p>
+        </section>
+      </main>
+    );
+  }
+
+  if (accessState === 'ready_for_intake') {
+    return (
+      <main className="mx-auto w-full max-w-3xl px-5 py-10 sm:py-12">
+        <AuthenticatedNav />
+
+        <section className="mt-14 rounded-2xl bg-surface p-7 shadow-[0_22px_70px_rgba(0,0,0,0.24)] sm:p-10">
+          <p className="text-sm uppercase tracking-widest text-brand">
+            Access active
+          </p>
+          <h1 className="mt-4 max-w-2xl font-display text-4xl leading-tight text-text sm:text-5xl">
+            Your Landed access is ready.
+          </h1>
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted">
+            Your purchase is connected to this account. Start with three quick
+            questions, then add the financial details Landed needs to build your
+            private roadmap.
+          </p>
+          <Link
+            href="/intake"
+            className="mt-8 inline-block rounded-xl bg-brand px-6 py-3.5 font-semibold text-black hover:opacity-90"
+          >
+            Start my roadmap
+          </Link>
+          <p className="mt-4 text-sm text-muted">
+            Nothing is saved until the financial step is complete.
+          </p>
+        </section>
+      </main>
+    );
+  }
 
   if (!journey) redirect('/intake');
 
