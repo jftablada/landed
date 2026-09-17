@@ -44,7 +44,8 @@ replying to the customer.
 
 ## Grandfather access
 
-`has_landed_access()` also permits a user who already owns an intake. This is a
-compatibility rule for users who used Landed before payment enforcement. New
-users cannot obtain grandfather access through the normal flow because
-`POST /api/intake` checks entitlement before it writes an intake row.
+`has_landed_access()` also permits users who own an intake created before
+`2026-09-13 21:41:04 UTC`, when payment enforcement reached production. This
+timestamp makes the legacy cohort permanent and fixed: a newer intake can never
+grant access on its own. `POST /api/intake` still checks entitlement before it
+writes any intake row.

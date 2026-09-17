@@ -33,7 +33,11 @@ as $$
         and payment_status <> 'unpaid'
     )
     or exists (
-      select 1 from public.intakes where user_id = auth.uid()
+      -- Fixed legacy cohort: the entitlement gate reached production at
+      -- 2026-09-13 21:41:04 UTC. New intake rows can never create access.
+      select 1 from public.intakes
+      where user_id = auth.uid()
+        and created_at < timestamptz '2026-09-13 21:41:04+00'
     );
 $$;
 
