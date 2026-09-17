@@ -4,6 +4,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import { trackEvent } from '@/lib/analytics';
+import {
+  buildConfirmationRedirect,
+  getLoginArrivalState,
+  type LoginArrivalState,
+} from '@/lib/auth/activation';
 import OnboardingProgress from '@/app/components/OnboardingProgress';
 
 export default function LoginPage() {
@@ -20,12 +25,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [arrivedFromCheckout, setArrivedFromCheckout] = useState(false);
+  const [arrivalState, setArrivalState] =
+    useState<LoginArrivalState>('standard');
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setArrivedFromCheckout(params.get('checkout') === 'success');
+    const nextArrivalState = getLoginArrivalState(window.location.search);
+    setArrivalState(nextArrivalState);
+    if (nextArrivalState === 'confirmed') {
+      trackEvent('email_confirmation_returned');
+    }
   }, []);
+
+  const arrivedFromCheckout = arrivalState === 'checkout';
+  const emailConfirmed = arrivalState === 'confirmed';
 
   async function signUp() {
     setBusy(true);
@@ -33,6 +45,9 @@ export default function LoginPage() {
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
+      options: {
+        emailRedirectTo: buildConfirmationRedirect(window.location.origin),
+      },
     });
     setBusy(false);
 
@@ -48,7 +63,36 @@ export default function LoginPage() {
     }
 
     setStatus(
-      'Account created. Check your inbox or junk/spam folder for the confirmation email, then return here to sign in.',
+      'Account created. Check your inbox or junk/spam folder for the confirmation email. Its link will bring you back here.',
+    );
+  }
+
+  async function resendConfirmation() {
+    const normalizedEmail = email.trim();
+    if (!normalizedEmail) {
+      setStatus('Enter the email address you used to create your account first.');
+      return;
+    }
+
+    setBusy(true);
+    setStatus(null);
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: normalizedEmail,
+      options: {
+        emailRedirectTo: buildConfirmationRedirect(window.location.origin),
+      },
+    });
+    setBusy(false);
+
+    if (error) {
+      setStatus(`Couldn’t resend the confirmation email: ${error.message}`);
+      return;
+    }
+
+    trackEvent('confirmation_email_resent');
+    setStatus(
+      'Confirmation email sent. Check your inbox and junk/spam folder.',
     );
   }
 
@@ -71,6 +115,14 @@ export default function LoginPage() {
       setStatus('That email or password didn’t match. Try again.');
       return;
     }
+    trackEvent('sign_in_completed', {
+      arrival:
+        arrivalState === 'confirmed'
+          ? 'confirmation_return'
+          : arrivalState === 'checkout'
+            ? 'checkout'
+            : 'standard',
+    });
     setStatus('Welcome back. Taking you to your plan…');
     router.push('/start');
   }
@@ -81,20 +133,30 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto w-full max-w-sm px-5 py-20">
-      {arrivedFromCheckout && (
+      {(arrivedFromCheckout || emailConfirmed) && (
         <OnboardingProgress
           currentStep={2}
-          detail="Payment is complete. Account setup usually takes about two minutes."
+          detail={
+            emailConfirmed
+              ? 'Your email is confirmed. Sign in to continue to your Landed account.'
+              : 'Payment is complete. Account setup usually takes about two minutes.'
+          }
         />
       )}
       <p className="text-muted text-sm uppercase tracking-widest mb-2">Landed</p>
       <h1 className="font-display text-4xl leading-tight mb-2 max-w-xs text-balance">
-        {arrivedFromCheckout ? 'Payment received. Let’s get you started.' : 'You just got the call. Now what?'}
+        {emailConfirmed
+          ? 'Email confirmed. Sign in to continue.'
+          : arrivedFromCheckout
+            ? 'Payment received. Let’s get you started.'
+            : 'You just got the call. Now what?'}
       </h1>
       <p className="text-muted mb-10">
-        {arrivedFromCheckout
-          ? 'Create your Landed account below using the email address from checkout.'
-          : 'Sign in, or create an account to build your recovery plan.'}
+        {emailConfirmed
+          ? 'Use the email and password you chose when creating your account.'
+          : arrivedFromCheckout
+            ? 'Create your Landed account below using the email address from checkout.'
+            : 'Sign in, or create an account to build your recovery plan.'}
       </p>
 
       <div className="space-y-4">
@@ -149,7 +211,19 @@ export default function LoginPage() {
           </button>
         </div>
         <p className="text-muted text-xs leading-relaxed pt-1">
-          Trouble signing in? Email{' '}
+          Didn’t receive the confirmation email?{' '}
+          <button
+            type="button"
+            onClick={resendConfirmation}
+            disabled={busy}
+            className="underline hover:text-text disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Resend it
+          </button>
+          .
+        </p>
+        <p className="text-muted text-xs leading-relaxed pt-1">
+          Still having trouble? Email{' '}
           <a
             href="mailto:hello@getlanded.ca"
             className="underline hover:text-text"
@@ -160,7 +234,7 @@ export default function LoginPage() {
         <p className="text-muted text-xs leading-relaxed pt-1">
           After signing up, check your inbox or junk/spam folder for your Landed confirmation email.
           If it lands in junk, mark it as "Not junk" before opening the link.
-</p>
+        </p>
         {status && <p className="text-muted text-sm pt-1">{status}</p>}
       </div>
     </main>
