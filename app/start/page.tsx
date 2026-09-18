@@ -7,10 +7,7 @@ import { hasLandedAccess } from '@/lib/billing/entitlement';
 import { resolveStartAccessState } from '@/lib/billing/startAccess';
 import { deriveWeeklyTasks } from '@/lib/core/deriveWeeklyTasks';
 import type { RoadmapOutput } from '@/lib/core/generateRoadmapForIntake';
-import {
-  createSupabaseServerClient,
-  getAuthedUserId,
-} from '@/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 const MODE_LABEL: Record<string, string> = {
   critical: 'Stabilize first',
@@ -40,10 +37,13 @@ function updateLabel(isoDate: string): string {
 }
 
 export default async function StartPage() {
-  const userId = await getAuthedUserId();
-  if (!userId) redirect('/login');
-
   const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+
+  const userId = user.id;
   const hasAccess = await hasLandedAccess(supabase);
   const { data: journey } = await supabase
     .from('journeys')
@@ -72,6 +72,12 @@ export default async function StartPage() {
             We don’t see an active Landed purchase for the email on this
             account yet.
           </p>
+          {user.email ? (
+            <p className="mt-3 text-sm text-muted">
+              Signed in as{' '}
+              <span className="font-medium text-text">{user.email}</span>
+            </p>
+          ) : null}
 
           <div className="mt-8 rounded-xl bg-surface-2 p-5 sm:p-6">
             <p className="font-medium text-text">Just completed checkout?</p>
