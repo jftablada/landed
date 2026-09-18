@@ -1,6 +1,11 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import {
+  AccessRecoveryTracker,
+  AccessRecheckButton,
+  AccessSupportLink,
+} from '@/app/components/AccessRecoveryAnalytics';
 import AuthenticatedNav from '@/app/components/AuthenticatedNav';
 import DisclosureSection from '@/app/components/DisclosureSection';
 import { hasLandedAccess } from '@/lib/billing/entitlement';
@@ -59,6 +64,7 @@ export default async function StartPage() {
   if (accessState === 'missing_purchase') {
     return (
       <main className="mx-auto w-full max-w-3xl px-5 py-10 sm:py-12">
+        <AccessRecoveryTracker accessGranted={false} />
         <AuthenticatedNav />
 
         <section className="mt-14 rounded-2xl bg-surface p-7 shadow-[0_22px_70px_rgba(0,0,0,0.24)] sm:p-10">
@@ -85,14 +91,7 @@ export default async function StartPage() {
               It can take a moment for your purchase to connect. Wait about a
               minute, then check again using the same account.
             </p>
-            <form action="/start" method="get">
-              <button
-                type="submit"
-                className="mt-5 rounded-xl bg-brand px-6 py-3.5 font-semibold text-black hover:opacity-90"
-              >
-                Check my access again
-              </button>
-            </form>
+            <AccessRecheckButton />
           </div>
 
           <div className="mt-4 rounded-xl border border-hair p-5 sm:p-6">
@@ -103,12 +102,7 @@ export default async function StartPage() {
               Email us from either address and include the email you used at
               checkout. Never send your password or card information.
             </p>
-            <a
-              href="mailto:hello@getlanded.ca?subject=Connect%20my%20Landed%20purchase"
-              className="mt-4 inline-block text-sm font-medium text-text underline decoration-hair underline-offset-4 hover:text-brand"
-            >
-              Email hello@getlanded.ca
-            </a>
+            <AccessSupportLink />
           </div>
 
           <p className="mt-6 text-sm leading-relaxed text-muted">
@@ -126,6 +120,7 @@ export default async function StartPage() {
   if (accessState === 'ready_for_intake') {
     return (
       <main className="mx-auto w-full max-w-3xl px-5 py-10 sm:py-12">
+        <AccessRecoveryTracker accessGranted />
         <AuthenticatedNav />
 
         <section className="mt-14 rounded-2xl bg-surface p-7 shadow-[0_22px_70px_rgba(0,0,0,0.24)] sm:p-10">
@@ -217,6 +212,7 @@ export default async function StartPage() {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-5 py-10 sm:py-12">
+      <AccessRecoveryTracker accessGranted />
       <AuthenticatedNav roadmapId={roadmap.id} />
 
       <header className="mt-14 pb-8">
