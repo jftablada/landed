@@ -69,21 +69,39 @@ export default async function StartPage() {
             Let’s connect your purchase.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted">
-            We don’t see a Landed purchase for the email on this account. This
-            usually means checkout used a different email address.
+            We don’t see an active Landed purchase for the email on this
+            account yet.
           </p>
 
           <div className="mt-8 rounded-xl bg-surface-2 p-5 sm:p-6">
-            <p className="font-medium text-text">Already paid?</p>
+            <p className="font-medium text-text">Just completed checkout?</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted">
+              It can take a moment for your purchase to connect. Wait about a
+              minute, then check again using the same account.
+            </p>
+            <form action="/start" method="get">
+              <button
+                type="submit"
+                className="mt-5 rounded-xl bg-brand px-6 py-3.5 font-semibold text-black hover:opacity-90"
+              >
+                Check my access again
+              </button>
+            </form>
+          </div>
+
+          <div className="mt-4 rounded-xl border border-hair p-5 sm:p-6">
+            <p className="font-medium text-text">
+              Paid with a different email?
+            </p>
             <p className="mt-2 text-sm leading-relaxed text-muted">
               Email us from either address and include the email you used at
               checkout. Never send your password or card information.
             </p>
             <a
               href="mailto:hello@getlanded.ca?subject=Connect%20my%20Landed%20purchase"
-              className="mt-5 inline-block rounded-xl bg-brand px-6 py-3.5 font-semibold text-black hover:opacity-90"
+              className="mt-4 inline-block text-sm font-medium text-text underline decoration-hair underline-offset-4 hover:text-brand"
             >
-              Email Landed support
+              Email hello@getlanded.ca
             </a>
           </div>
 
