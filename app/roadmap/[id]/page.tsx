@@ -244,6 +244,7 @@ export default async function RoadmapPage({
           eyebrow="Progress"
           title="Since your last check-in"
           summary={output.adaptive.what_changed}
+          open
         >
         <section
           className={`rounded-xl bg-surface-2 p-6 ${

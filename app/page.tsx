@@ -177,8 +177,8 @@ export default function HomePage() {
                 },
                 {
                   icon: <BoltIcon />,
-                  title: 'Momentum, not busywork',
-                  body: 'Focused steps, weekly check-ins.',
+                  title: 'A plan that responds',
+                  body: 'Weekly check-ins change what comes next.',
                 },
                 {
                   icon: <LifeIcon />,
@@ -308,9 +308,9 @@ export default function HomePage() {
               See enough to know what you’re getting
             </h2>
             <p className="mt-4 max-w-md text-muted">
-              This sample shows the shape of a Landed roadmap. Your complete
-              priorities, task sequence, financial context, and adaptive
-              check-ins stay private to your account.
+              This sample shows the shape of a Landed roadmap. Unlike a static
+              checklist, your private plan uses each check-in to explain what
+              changed, what it suggests, and what to prioritize next.
             </p>
           </div>
 
@@ -398,7 +398,7 @@ export default function HomePage() {
           <ul className="mt-8 space-y-3">
             {[
               '90-Day Recovery Roadmap',
-              'Check-ins that update your plan',
+              'Adaptive check-ins that change what comes next',
               'Canadian context layer',
            'Founder onboarding within one business day',
               'Personal roadmap review from the founder',

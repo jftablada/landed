@@ -299,7 +299,12 @@ export default async function StartPage() {
             </div>
           </DisclosureSection>
 
-          <DisclosureSection eyebrow="Progress" title="Job-search pulse" summary="Your latest activity and how the plan is responding.">
+          <DisclosureSection
+            eyebrow="Progress"
+            title="Job-search pulse"
+            summary="Your latest activity and how the plan is responding."
+            open={Boolean(output?.adaptive)}
+          >
           <section className="grid gap-5 md:grid-cols-2">
             <div className="rounded-xl border border-hair bg-surface p-6">
               <div className="flex items-start justify-between gap-4">

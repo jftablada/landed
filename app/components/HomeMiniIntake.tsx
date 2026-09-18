@@ -402,9 +402,11 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
                   </h4>
                   <p className="mt-2 text-sm leading-relaxed text-muted">
                     This free starting point shows what to investigate. The full
-                    roadmap uses your cash, monthly costs, obligations, and
-                    confirmed support to calculate your runway, order your next
-                    actions, and adapt through check-ins.
+                    roadmap uses your cash, monthly costs, and confirmed support
+                    to calculate your runway and order your next actions. Each
+                    check-in then changes the plan based on what actually
+                    happened—applications, responses, interviews, offers, and
+                    financial shifts.
                   </p>
 
                   <div className="mt-5 rounded-lg border border-hair bg-surface-2 p-4">
