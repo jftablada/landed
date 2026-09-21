@@ -7,6 +7,10 @@ import { useRouter } from 'next/navigation';
 import LogoutButton from '@/app/components/LogoutButton';
 import { trackEvent } from '@/lib/analytics';
 import OnboardingProgress from '@/app/components/OnboardingProgress';
+import {
+  SavedIntakeGenerationError,
+  saveIntakeAndGenerateRoadmap,
+} from '@/lib/core/createInitialRoadmap';
 
 type ProvinceCode =
   | 'AB'
@@ -23,7 +27,7 @@ type ProvinceCode =
   | 'SK'
   | 'YT';
 
-type IntakeStep = 'start' | 'resources' | 'financials';
+type IntakeStep = 'start' | 'resources' | 'financials' | 'resume';
 
 interface ProvinceResources {
   name: string;
@@ -148,6 +152,7 @@ export default function IntakePage() {
 
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [pendingIntakeId, setPendingIntakeId] = useState<string | null>(null);
 
   const taxUnsure = taxStatus === 'unsure';
   const selectedProvince = PROVINCE_RESOURCES[province];
@@ -167,19 +172,26 @@ export default function IntakePage() {
   async function handleSubmit() {
     setError(null);
 
-    if (taxUnsure) {
+    if (!pendingIntakeId && taxUnsure) {
       setError('Please check your CRA balance first, then come back.');
       return;
     }
-    if (confirmedCash === '' || isNaN(Number(confirmedCash))) {
+    if (
+      !pendingIntakeId &&
+      (confirmedCash === '' || isNaN(Number(confirmedCash)))
+    ) {
       setError('Enter your confirmed cash (a number).');
       return;
     }
-    if (essentialBurn === '' || Number(essentialBurn) <= 0) {
+    if (
+      !pendingIntakeId &&
+      (essentialBurn === '' || Number(essentialBurn) <= 0)
+    ) {
       setError('Enter your essential monthly burn (greater than 0).');
       return;
     }
     if (
+      !pendingIntakeId &&
       taxStatus === 'has_amount' &&
       (taxAmount === '' || isNaN(Number(taxAmount)))
     ) {
@@ -187,6 +199,7 @@ export default function IntakePage() {
       return;
     }
     if (
+      !pendingIntakeId &&
       taxStatus === 'on_plan' &&
       (taxPlanMonthly === '' || isNaN(Number(taxPlanMonthly)))
     ) {
@@ -194,6 +207,7 @@ export default function IntakePage() {
       return;
     }
     if (
+      !pendingIntakeId &&
       (eiStatus === 'approved' || eiStatus === 'receiving') &&
       (eiAmount === '' || isNaN(Number(eiAmount)))
     ) {
@@ -224,37 +238,27 @@ export default function IntakePage() {
             : null,
       };
 
-      const intakeRes = await fetch('/api/intake', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(intakeBody),
-      });
-
-      const intakeData = await intakeRes.json();
-      if (!intakeRes.ok) {
-        throw new Error(
-          intakeData.message || intakeData.error || 'Could not save your intake.',
-        );
-      }
-      trackEvent('intake_submitted');
-
-      const genRes = await fetch('/api/roadmap/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ intake_id: intakeData.intake_id }),
-      });
-
-      const genData = await genRes.json();
-      if (!genRes.ok) {
-        throw new Error(
-          genData.error || 'Saved your intake, but could not build the plan.',
-        );
-      }
-
+      const roadmapId = await saveIntakeAndGenerateRoadmap(
+        intakeBody,
+        pendingIntakeId,
+        fetch,
+        (intakeId) => {
+          setPendingIntakeId(intakeId);
+          trackEvent('intake_submitted');
+        },
+      );
       trackEvent('roadmap_generated');
-      router.push(`/roadmap/${genData.roadmap_id}`);
+      router.push(`/roadmap/${roadmapId}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.');
+      if (err instanceof SavedIntakeGenerationError) {
+        setPendingIntakeId(err.intakeId);
+        setStep('resume');
+        setError(
+          'Your details are saved, but your plan could not be built yet. Please try again.',
+        );
+      } else {
+        setError(err instanceof Error ? err.message : 'Something went wrong.');
+      }
       setSubmitting(false);
     }
   }
@@ -276,7 +280,7 @@ export default function IntakePage() {
           href="/start"
           className="text-sm text-muted hover:text-text transition-colors"
         >
-          ← Back to my latest plan
+          ← Back to Your home
         </a>
       </div>
 
@@ -640,6 +644,45 @@ export default function IntakePage() {
             </div>
           </div>
         </>
+      )}
+
+      {step === 'resume' && (
+        <section className="rounded-2xl bg-surface p-7 sm:p-10">
+          <OnboardingProgress
+            currentStep={5}
+            detail="Your financial details are saved. There is no need to enter them again."
+          />
+          <p className="text-sm uppercase tracking-widest text-brand">
+            One last step
+          </p>
+          <h1 className="mt-3 font-display text-4xl leading-tight text-text">
+            Finish building your roadmap.
+          </h1>
+          <p className="mt-4 leading-relaxed text-muted">
+            We’ll use the details you already saved. Trying again will not
+            create another intake.
+          </p>
+          {error && (
+            <p role="alert" className="mt-5 text-sm text-red-400">
+              {error}
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={submitting}
+            className="mt-7 rounded-lg bg-brand px-5 py-3 font-medium text-black disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {submitting ? 'Building your plan…' : 'Try building my plan again'}
+          </button>
+          <p className="mt-5 text-sm text-muted">
+            You can also return to{' '}
+            <a href="/start" className="text-text underline underline-offset-4">
+              Your home
+            </a>{' '}
+            to resume later.
+          </p>
+        </section>
       )}
     </main>
   );

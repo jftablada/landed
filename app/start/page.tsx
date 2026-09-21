@@ -8,10 +8,12 @@ import {
 } from '@/app/components/AccessRecoveryAnalytics';
 import AuthenticatedNav from '@/app/components/AuthenticatedNav';
 import DisclosureSection from '@/app/components/DisclosureSection';
+import ResumeInitialRoadmap from '@/app/components/ResumeInitialRoadmap';
 import { hasLandedAccess } from '@/lib/billing/entitlement';
 import { resolveStartAccessState } from '@/lib/billing/startAccess';
 import { deriveWeeklyTasks } from '@/lib/core/deriveWeeklyTasks';
 import type { RoadmapOutput } from '@/lib/core/generateRoadmapForIntake';
+import { hasPendingInitialRoadmap } from '@/lib/core/pendingInitialRoadmap';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 const MODE_LABEL: Record<string, string> = {
@@ -151,15 +153,63 @@ export default async function StartPage() {
 
   if (!journey) redirect('/intake');
 
-  const { data: roadmaps } = await supabase
-    .from('roadmaps')
-    .select('id, journey_id, blocked, computed_mode, created_at, output_json')
-    .eq('user_id', userId)
-    .eq('journey_id', journey.id)
-    .order('created_at', { ascending: false })
-    .limit(6);
+  const [
+    { data: roadmaps, error: roadmapsError },
+    { data: latestIntake, error: intakeError },
+  ] = await Promise.all([
+    supabase
+      .from('roadmaps')
+      .select('id, intake_id, journey_id, blocked, computed_mode, created_at, output_json')
+      .eq('user_id', userId)
+      .eq('journey_id', journey.id)
+      .order('created_at', { ascending: false })
+      .limit(6),
+    supabase
+      .from('intakes')
+      .select('id, created_at')
+      .eq('user_id', userId)
+      .eq('journey_id', journey.id)
+      .eq('source', 'intake')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+  if (roadmapsError || intakeError) {
+    throw new Error('Could not load your saved roadmap progress.');
+  }
 
   const roadmap = roadmaps?.[0];
+  if (latestIntake && hasPendingInitialRoadmap(latestIntake, roadmap)) {
+    return (
+      <main className="mx-auto w-full max-w-3xl px-5 py-10 sm:py-12">
+        <AccessRecoveryTracker accessGranted />
+        <AuthenticatedNav roadmapId={roadmap?.id} />
+        <section className="mt-14 rounded-2xl bg-surface p-7 shadow-[0_22px_70px_rgba(0,0,0,0.24)] sm:p-10">
+          <p className="text-sm uppercase tracking-widest text-brand">
+            Your details are saved
+          </p>
+          <h1 className="mt-4 font-display text-4xl leading-tight text-text sm:text-5xl">
+            Let’s finish your roadmap.
+          </h1>
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted">
+            You don’t need to answer the financial questions again. We’ll build
+            your roadmap using the details you already saved.
+          </p>
+          <div className="mt-8">
+            <ResumeInitialRoadmap intakeId={latestIntake.id} />
+          </div>
+          {roadmap ? (
+            <Link
+              href={`/roadmap/${roadmap.id}`}
+              className="mt-6 inline-block text-sm text-muted underline underline-offset-4 hover:text-text"
+            >
+              View my previous roadmap
+            </Link>
+          ) : null}
+        </section>
+      </main>
+    );
+  }
   if (!roadmap) redirect('/intake');
 
   const output = parseOutput(roadmap.output_json);
