@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getAuthedUserId, createSupabaseServerClient } from '@/lib/supabase/server';
 import { hasLandedAccess, PAYMENT_REQUIRED_RESPONSE } from '@/lib/billing/entitlement';
+import {
+  validateIntakeSnapshot,
+  validateSituationType,
+} from '../../../lib/core/validateIntakeSnapshot';
 
 export async function POST(req: Request) {
   try {
@@ -15,7 +19,13 @@ export async function POST(req: Request) {
     if (!(await hasLandedAccess(supabase))) {
       return NextResponse.json(PAYMENT_REQUIRED_RESPONSE, { status: 402 });
     }
-    const body = await req.json();
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return NextResponse.json(
+        { error: 'A valid intake is required.' },
+        { status: 400 },
+      );
+    }
 
     const {
       situation_type,
@@ -56,24 +66,28 @@ export async function POST(req: Request) {
       );
     }
 
-    if (tax_obligation_status === 'has_amount' && tax_obligation_amount == null) {
+    const validationError =
+      validateSituationType(situation_type) ??
+      validateIntakeSnapshot({
+        employment_type,
+        housing_type,
+        province,
+        dependents_count,
+        confirmed_cash,
+        essential_burn,
+        debt_minimums,
+        tax_obligation_status,
+        tax_obligation_amount,
+        tax_plan_monthly,
+        ei_status,
+        ei_monthly_amount,
+        pending_invoice_amount,
+        pending_invoice_confirmed,
+      });
+    if (validationError) {
       return NextResponse.json(
-        { error: 'tax_obligation_amount is required when tax_obligation_status is has_amount' },
-        { status: 400 }
-      );
-    }
-
-    if (tax_obligation_status === 'on_plan' && tax_plan_monthly == null) {
-      return NextResponse.json(
-        { error: 'tax_plan_monthly is required when tax_obligation_status is on_plan' },
-        { status: 400 }
-      );
-    }
-
-    if (Number(essential_burn) <= 0) {
-      return NextResponse.json(
-        { error: 'essential_burn must be greater than 0' },
-        { status: 400 }
+        { error: validationError },
+        { status: 400 },
       );
     }
 

@@ -22,6 +22,19 @@ vi.mock('@/lib/billing/entitlement', () => ({
 
 import { POST } from './route';
 
+const VALID_INTAKE = {
+  situation_type: 'laid_off',
+  employment_type: 'employee',
+  housing_type: 'rent',
+  province: 'ON',
+  dependents_count: 0,
+  confirmed_cash: 8000,
+  essential_burn: 3000,
+  debt_minimums: 500,
+  tax_obligation_status: 'none',
+  ei_status: 'not_applied',
+};
+
 describe('POST /api/intake paid access', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -49,4 +62,35 @@ describe('POST /api/intake paid access', () => {
     });
     expect(from).not.toHaveBeenCalled();
   });
+
+  it.each([
+    [{ confirmed_cash: -1 }, 'Cash on hand'],
+    [{ confirmed_cash: '8000' }, 'Cash on hand'],
+    [{ essential_burn: 0 }, 'Monthly essential costs'],
+    [{ debt_minimums: -1 }, 'Monthly debt minimums'],
+    [{ province: 'XX' }, 'province'],
+    [{ ei_status: 'receiving' }, 'monthly EI amount'],
+    [{ tax_obligation_status: 'has_amount' }, 'tax you owe'],
+  ] as const)(
+    'rejects invalid financial data before creating a journey or intake: %j',
+    async (change, expectedMessage) => {
+      const from = vi.fn();
+      mocks.getAuthedUserId.mockResolvedValue('paid-user');
+      mocks.createSupabaseServerClient.mockResolvedValue({ from });
+      mocks.hasLandedAccess.mockResolvedValue(true);
+
+      const response = await POST(
+        new Request('http://localhost/api/intake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...VALID_INTAKE, ...change }),
+        }),
+      );
+
+      expect(response.status).toBe(400);
+      const result = await response.json();
+      expect(result.error).toContain(expectedMessage);
+      expect(from).not.toHaveBeenCalled();
+    },
+  );
 });

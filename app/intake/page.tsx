@@ -11,6 +11,7 @@ import {
   SavedIntakeGenerationError,
   saveIntakeAndGenerateRoadmap,
 } from '@/lib/core/createInitialRoadmap';
+import { validateRunwayInputs } from '@/lib/core/validateIntakeSnapshot';
 
 type ProvinceCode =
   | 'AB'
@@ -237,6 +238,19 @@ export default function IntakePage() {
             ? Number(eiAmount)
             : null,
       };
+
+      if (!pendingIntakeId) {
+        const runwayError = validateRunwayInputs(
+          intakeBody.confirmed_cash,
+          intakeBody.essential_burn,
+          intakeBody.debt_minimums,
+        );
+        if (runwayError) {
+          setError(runwayError);
+          setSubmitting(false);
+          return;
+        }
+      }
 
       const roadmapId = await saveIntakeAndGenerateRoadmap(
         intakeBody,
@@ -479,7 +493,7 @@ export default function IntakePage() {
           </p>
 
           <div className="space-y-5">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-1.5">
                 <label className={labelCls}>Rent or own?</label>
                 <select
@@ -504,7 +518,7 @@ export default function IntakePage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-1.5">
                 <label className={labelCls}>Cash on hand ($)</label>
                 <input
@@ -518,7 +532,7 @@ export default function IntakePage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className={labelCls}>Monthly costs ($)</label>
+                <label className={labelCls}>Monthly essential costs ($)</label>
                 <input
                   className={fieldCls}
                   type="number"
@@ -527,6 +541,10 @@ export default function IntakePage() {
                   onChange={(e) => setEssentialBurn(e.target.value)}
                   placeholder="3000"
                 />
+                <p className="text-xs leading-relaxed text-muted">
+                  Include essentials like housing, food, and utilities. Leave
+                  out debt minimums and tax-plan payments entered separately.
+                </p>
               </div>
             </div>
 
@@ -539,6 +557,9 @@ export default function IntakePage() {
                 value={debtMinimums}
                 onChange={(e) => setDebtMinimums(e.target.value)}
               />
+              <p className="text-xs leading-relaxed text-muted">
+                Tracked in your plan, but not included in the displayed runway.
+              </p>
             </div>
 
             <div className="flex flex-col gap-1.5">

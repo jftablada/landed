@@ -9,6 +9,7 @@ import {
   CANADIAN_PROVINCES,
   isCanadianProvinceCode,
 } from '@/lib/core/canadianProvinces';
+import { validateRunwayInputs } from '@/lib/core/validateIntakeSnapshot';
 
 export default function CheckinClient() {
   const router = useRouter();
@@ -115,7 +116,17 @@ export default function CheckinClient() {
     }
 
     if (essentialBurn === '' || Number(essentialBurn) <= 0) {
-      setError('Enter your monthly costs.');
+      setError('Enter your monthly essential costs.');
+      return;
+    }
+
+    const runwayError = validateRunwayInputs(
+      Number(confirmedCash),
+      Number(essentialBurn),
+      Number(debtMinimums),
+    );
+    if (runwayError) {
+      setError(runwayError);
       return;
     }
 
@@ -396,7 +407,7 @@ export default function CheckinClient() {
           Your financial situation
         </h3>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <label className={labelCls}>Cash on hand ($)</label>
             <input
@@ -409,7 +420,7 @@ export default function CheckinClient() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className={labelCls}>Monthly costs ($)</label>
+            <label className={labelCls}>Monthly essential costs ($)</label>
             <input
               className={fieldCls}
               type="number"
@@ -417,6 +428,9 @@ export default function CheckinClient() {
               value={essentialBurn}
               onChange={(e) => setEssentialBurn(e.target.value)}
             />
+            <p className="text-xs leading-relaxed text-muted">
+              Exclude debt minimums and tax-plan payments entered separately.
+            </p>
           </div>
         </div>
 
@@ -429,6 +443,9 @@ export default function CheckinClient() {
             value={debtMinimums}
             onChange={(e) => setDebtMinimums(e.target.value)}
           />
+          <p className="text-xs leading-relaxed text-muted">
+            Tracked in your plan, but not included in the displayed runway.
+          </p>
         </div>
 
         <div className="flex flex-col gap-1.5">

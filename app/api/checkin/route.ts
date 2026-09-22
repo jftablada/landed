@@ -25,7 +25,7 @@ import {
 } from '@/lib/core/generateRoadmapForIntake.impl';
 import { templateStubClient } from '@/lib/ai/templateStubClient';
 import { SYSTEM_PROMPT } from '@/lib/ai/systemPrompt';
-import { isCanadianProvinceCode } from '@/lib/core/canadianProvinces';
+import { validateIntakeSnapshot } from '../../../lib/core/validateIntakeSnapshot';
 import { hasLandedAccess, PAYMENT_REQUIRED_RESPONSE } from '@/lib/billing/entitlement';
 
 // The 17 carry-forward fields — everything on intakes EXCEPT the
@@ -202,39 +202,10 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
-    if (
-      !merged.employment_type ||
-      !merged.housing_type ||
-      merged.confirmed_cash == null ||
-      merged.essential_burn == null ||
-      !taxStatus
-    ) {
+    const validationError = validateIntakeSnapshot(merged);
+    if (validationError) {
       return NextResponse.json(
-        { error: 'Merged intake is missing required fields' },
-        { status: 400 },
-      );
-    }
-    if (!isCanadianProvinceCode(merged.province)) {
-      return NextResponse.json(
-        { error: 'province must be a supported Canadian province or territory' },
-        { status: 400 },
-      );
-    }
-    if (taxStatus === 'has_amount' && merged.tax_obligation_amount == null) {
-      return NextResponse.json(
-        { error: 'tax_obligation_amount required when status is has_amount' },
-        { status: 400 },
-      );
-    }
-    if (taxStatus === 'on_plan' && merged.tax_plan_monthly == null) {
-      return NextResponse.json(
-        { error: 'tax_plan_monthly required when status is on_plan' },
-        { status: 400 },
-      );
-    }
-    if (Number(merged.essential_burn) <= 0) {
-      return NextResponse.json(
-        { error: 'essential_burn must be greater than 0' },
+        { error: validationError },
         { status: 400 },
       );
     }
