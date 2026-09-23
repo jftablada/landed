@@ -1,11 +1,7 @@
 import { isCanadianProvinceCode } from './canadianProvinces';
+import { SITUATION_LABELS } from './freeStartingPoint';
 
-const SITUATION_TYPES = new Set([
-  'laid_off',
-  'non_renewal',
-  'contract_ending',
-  'pivot',
-]);
+const SITUATION_TYPES = new Set(Object.keys(SITUATION_LABELS));
 const EMPLOYMENT_TYPES = new Set([
   'employee',
   'sole_proprietor',

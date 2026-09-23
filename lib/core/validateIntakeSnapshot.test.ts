@@ -26,6 +26,7 @@ describe('intake snapshot validation', () => {
   it('accepts a complete supported snapshot', () => {
     expect(validateIntakeSnapshot(valid)).toBeNull();
     expect(validateSituationType('laid_off')).toBeNull();
+    expect(validateSituationType('dismissed')).toBeNull();
   });
 
   it.each([

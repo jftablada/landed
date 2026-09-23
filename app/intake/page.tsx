@@ -12,6 +12,11 @@ import {
   saveIntakeAndGenerateRoadmap,
 } from '@/lib/core/createInitialRoadmap';
 import { validateRunwayInputs } from '@/lib/core/validateIntakeSnapshot';
+import {
+  SITUATION_FRAMING,
+  SITUATION_LABELS,
+  type SituationType,
+} from '@/lib/core/freeStartingPoint';
 
 type ProvinceCode =
   | 'AB'
@@ -137,7 +142,7 @@ export default function IntakePage() {
   const router = useRouter();
 
   const [step, setStep] = useState<IntakeStep>('start');
-  const [situationType, setSituationType] = useState('');
+  const [situationType, setSituationType] = useState<SituationType | ''>('');
   const [employmentType, setEmploymentType] = useState('');
   const [province, setProvince] = useState<ProvinceCode | ''>('');
   const [housingType, setHousingType] = useState('rent');
@@ -325,15 +330,16 @@ export default function IntakePage() {
                 className={fieldCls}
                 value={situationType}
                 onChange={(e) => {
-                  setSituationType(e.target.value);
+                  setSituationType(e.target.value as SituationType);
                   setError(null);
                 }}
               >
                 <option value="" disabled>Select what happened</option>
-                <option value="laid_off">I was laid off</option>
-                <option value="non_renewal">My contract wasn’t renewed</option>
-                <option value="contract_ending">My contract is ending soon</option>
-                <option value="pivot">I’m changing careers</option>
+                {Object.entries(SITUATION_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -385,7 +391,7 @@ export default function IntakePage() {
         </>
       )}
 
-      {step === 'resources' && selectedProvince && (
+      {step === 'resources' && selectedProvince && situationType && (
         <>
           <OnboardingProgress
             currentStep={3}
@@ -397,6 +403,9 @@ export default function IntakePage() {
           <h1 className="font-display text-4xl leading-tight mb-2 max-w-md text-balance">
             Start with these official resources
           </h1>
+          <p className="text-muted mb-4">
+            {SITUATION_FRAMING[situationType]}
+          </p>
           <p className="text-muted mb-8">
             Federal links for Canada and local information for{' '}
             {selectedProvince.name}.

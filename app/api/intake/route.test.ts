@@ -63,6 +63,61 @@ describe('POST /api/intake paid access', () => {
     expect(from).not.toHaveBeenCalled();
   });
 
+  it('accepts dismissal and stores it on a new journey', async () => {
+    const journeyInsert = vi.fn(() => ({
+      select: () => ({
+        single: async () => ({ data: { id: 'journey-1' }, error: null }),
+      }),
+    }));
+    const intakeInsert = vi.fn(() => ({
+      select: () => ({
+        single: async () => ({ data: { id: 'intake-1' }, error: null }),
+      }),
+    }));
+    const from = vi.fn((table: string) => {
+      if (table === 'journeys') {
+        return {
+          select: () => ({
+            eq: () => ({
+              eq: () => ({
+                maybeSingle: async () => ({ data: null, error: null }),
+              }),
+            }),
+          }),
+          insert: journeyInsert,
+        };
+      }
+      if (table === 'intakes') return { insert: intakeInsert };
+      throw new Error(`Unexpected table: ${table}`);
+    });
+    mocks.getAuthedUserId.mockResolvedValue('paid-user');
+    mocks.createSupabaseServerClient.mockResolvedValue({ from });
+    mocks.hasLandedAccess.mockResolvedValue(true);
+
+    const response = await POST(
+      new Request('http://localhost/api/intake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...VALID_INTAKE, situation_type: 'dismissed' }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      success: true,
+      intake_id: 'intake-1',
+      journey_id: 'journey-1',
+    });
+    expect(journeyInsert).toHaveBeenCalledWith({
+      user_id: 'paid-user',
+      situation_type: 'dismissed',
+      status: 'active',
+    });
+    expect(intakeInsert).toHaveBeenCalledWith(
+      expect.objectContaining({ journey_id: 'journey-1', user_id: 'paid-user' }),
+    );
+  });
+
   it.each([
     [{ confirmed_cash: -1 }, 'Cash on hand'],
     [{ confirmed_cash: '8000' }, 'Cash on hand'],
