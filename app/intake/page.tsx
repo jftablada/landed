@@ -137,9 +137,9 @@ export default function IntakePage() {
   const router = useRouter();
 
   const [step, setStep] = useState<IntakeStep>('start');
-  const [situationType, setSituationType] = useState('laid_off');
-  const [employmentType, setEmploymentType] = useState('employee');
-  const [province, setProvince] = useState<ProvinceCode>('ON');
+  const [situationType, setSituationType] = useState('');
+  const [employmentType, setEmploymentType] = useState('');
+  const [province, setProvince] = useState<ProvinceCode | ''>('');
   const [housingType, setHousingType] = useState('rent');
   const [dependentsCount, setDependentsCount] = useState('0');
   const [confirmedCash, setConfirmedCash] = useState('');
@@ -156,9 +156,13 @@ export default function IntakePage() {
   const [pendingIntakeId, setPendingIntakeId] = useState<string | null>(null);
 
   const taxUnsure = taxStatus === 'unsure';
-  const selectedProvince = PROVINCE_RESOURCES[province];
+  const selectedProvince = province ? PROVINCE_RESOURCES[province] : null;
 
   function showResources() {
+    if (!situationType || !province || !employmentType) {
+      setError('Choose an answer for all three questions to see your starting point.');
+      return;
+    }
     trackEvent('intake_stage_one_completed');
     setError(null);
     setStep('resources');
@@ -320,8 +324,12 @@ export default function IntakePage() {
               <select
                 className={fieldCls}
                 value={situationType}
-                onChange={(e) => setSituationType(e.target.value)}
+                onChange={(e) => {
+                  setSituationType(e.target.value);
+                  setError(null);
+                }}
               >
+                <option value="" disabled>Select what happened</option>
                 <option value="laid_off">I was laid off</option>
                 <option value="non_renewal">My contract wasn’t renewed</option>
                 <option value="contract_ending">My contract is ending soon</option>
@@ -334,8 +342,12 @@ export default function IntakePage() {
               <select
                 className={fieldCls}
                 value={province}
-                onChange={(e) => setProvince(e.target.value as ProvinceCode)}
+                onChange={(e) => {
+                  setProvince(e.target.value as ProvinceCode);
+                  setError(null);
+                }}
               >
+                <option value="" disabled>Select your province or territory</option>
                 {PROVINCES.map(([code, details]) => (
                   <option key={code} value={code}>
                     {details.name}
@@ -349,8 +361,12 @@ export default function IntakePage() {
               <select
                 className={fieldCls}
                 value={employmentType}
-                onChange={(e) => setEmploymentType(e.target.value)}
+                onChange={(e) => {
+                  setEmploymentType(e.target.value);
+                  setError(null);
+                }}
               >
+                <option value="" disabled>Select your work type</option>
                 <option value="employee">Employee</option>
                 <option value="sole_proprietor">Sole proprietor</option>
                 <option value="incorporated">Incorporated contractor</option>
@@ -364,11 +380,12 @@ export default function IntakePage() {
             >
               Show me where to start
             </button>
+            {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
           </div>
         </>
       )}
 
-      {step === 'resources' && (
+      {step === 'resources' && selectedProvince && (
         <>
           <OnboardingProgress
             currentStep={3}

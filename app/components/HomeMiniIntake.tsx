@@ -122,23 +122,35 @@ interface HomeMiniIntakeProps {
 }
 
 export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
-  const [situation, setSituation] = useState<SituationType>('laid_off');
-  const [province, setProvince] = useState<ProvinceCode>('ON');
+  const [situation, setSituation] = useState<SituationType | ''>('');
+  const [province, setProvince] = useState<ProvinceCode | ''>('');
   const [employmentType, setEmploymentType] =
-    useState<EmploymentType>('employee');
+    useState<EmploymentType | ''>('');
   const [showResult, setShowResult] = useState(false);
+  const [selectionError, setSelectionError] = useState<string | null>(null);
   const [roughCash, setRoughCash] = useState('');
   const [roughMonthlyCosts, setRoughMonthlyCosts] = useState('');
   const [roughRunwayWeeks, setRoughRunwayWeeks] = useState<number | null>(null);
   const [roughRunwayError, setRoughRunwayError] = useState<string | null>(null);
 
-  const selectedProvince = PROVINCE_RESOURCES[province];
-  const todayActions = getTodayActions(employmentType);
-  const thisWeekLinks = getThisWeekLinks(employmentType);
+  const selectedAnswers = situation && province && employmentType
+    ? { situation, province: PROVINCE_RESOURCES[province], employmentType }
+    : null;
+  const todayActions = selectedAnswers
+    ? getTodayActions(selectedAnswers.employmentType)
+    : [];
+  const thisWeekLinks = selectedAnswers
+    ? getThisWeekLinks(selectedAnswers.employmentType)
+    : [];
   const fieldClass =
     'w-full rounded-lg border border-hair bg-surface-2 px-3 py-3 text-base text-text focus:border-brand focus:outline-none';
 
   function buildStartingPoint() {
+    if (!selectedAnswers) {
+      setSelectionError('Choose an answer for all three questions to see your starting point.');
+      return;
+    }
+    setSelectionError(null);
     trackEvent('free_starting_point_generated');
     setShowResult(true);
     window.requestAnimationFrame(() => {
@@ -207,7 +219,7 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
           </div>
 
           <div className="rounded-2xl border border-hair bg-surface p-6 sm:p-8">
-            {!showResult ? (
+            {!showResult || !selectedAnswers ? (
               <div className="space-y-5">
                 <div>
                   <label htmlFor="preview-situation" className="mb-1.5 block text-sm text-muted">
@@ -216,11 +228,13 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
                   <select
                     id="preview-situation"
                     value={situation}
-                    onChange={(event) =>
-                      setSituation(event.target.value as SituationType)
-                    }
+                    onChange={(event) => {
+                      setSituation(event.target.value as SituationType);
+                      setSelectionError(null);
+                    }}
                     className={fieldClass}
                   >
+                    <option value="" disabled>Select what happened</option>
                     {Object.entries(SITUATION_LABELS).map(([value, label]) => (
                       <option key={value} value={value}>
                         {label}
@@ -236,11 +250,13 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
                   <select
                     id="preview-province"
                     value={province}
-                    onChange={(event) =>
-                      setProvince(event.target.value as ProvinceCode)
-                    }
+                    onChange={(event) => {
+                      setProvince(event.target.value as ProvinceCode);
+                      setSelectionError(null);
+                    }}
                     className={fieldClass}
                   >
+                    <option value="" disabled>Select your province or territory</option>
                     {PROVINCES.map(([code, details]) => (
                       <option key={code} value={code}>
                         {details.name}
@@ -256,11 +272,13 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
                   <select
                     id="preview-work-type"
                     value={employmentType}
-                    onChange={(event) =>
-                      setEmploymentType(event.target.value as EmploymentType)
-                    }
+                    onChange={(event) => {
+                      setEmploymentType(event.target.value as EmploymentType);
+                      setSelectionError(null);
+                    }}
                     className={fieldClass}
                   >
+                    <option value="" disabled>Select your work type</option>
                     <option value="employee">Employee</option>
                     <option value="sole_proprietor">Sole proprietor</option>
                     <option value="incorporated">Incorporated contractor</option>
@@ -274,6 +292,11 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
                 >
                   Show my starting point
                 </button>
+                {selectionError && (
+                  <p role="alert" className="text-sm text-red-400">
+                    {selectionError}
+                  </p>
+                )}
                 <p className="text-xs leading-relaxed text-muted">
                   This preview runs only in your browser. It does not create an
                   account or send your answers to Landed.
@@ -288,10 +311,10 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
                   A clearer place to begin
                 </h3>
                 <p className="mt-2 text-sm text-muted">
-                  Based on “{SITUATION_LABELS[situation]}” in {selectedProvince.name}.
+                  Based on “{SITUATION_LABELS[selectedAnswers.situation]}” in {selectedAnswers.province.name}.
                 </p>
                 <p className="mt-4 text-sm leading-relaxed text-text">
-                  {SITUATION_FRAMING[situation]}
+                  {SITUATION_FRAMING[selectedAnswers.situation]}
                 </p>
 
                 <section className="mt-8 border-t border-hair pt-6">
@@ -352,7 +375,7 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
                     Your province
                   </p>
                   <h4 className="mt-2 font-display text-2xl text-text">
-                    Official {selectedProvince.name} resources
+                    Official {selectedAnswers.province.name} resources
                   </h4>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     {[
@@ -360,13 +383,13 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
                         label: 'Employment standards',
                         description:
                           'Official information on workplace rights and employer obligations.',
-                        url: selectedProvince.employmentStandardsUrl,
+                        url: selectedAnswers.province.employmentStandardsUrl,
                       },
                       {
                         label: 'Employment services',
                         description:
                           'Government-supported job-search, career, and training services.',
-                        url: selectedProvince.employmentServicesUrl,
+                        url: selectedAnswers.province.employmentServicesUrl,
                       },
                     ].map(({ label, description, url }) => (
                       <a
