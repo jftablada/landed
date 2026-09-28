@@ -50,12 +50,33 @@ function signedRequest(payload: string) {
 describe('Stripe entitlement webhook', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    delete process.env.VERCEL_ENV;
+    delete process.env.STRIPE_TEST_WEBHOOK_SECRET;
+    delete process.env.STRIPE_TEST_SECRET_KEY;
+    delete process.env.STRIPE_TEST_PAYMENT_LINK_ID;
+    delete process.env.SUPABASE_TEST_SECRET_KEY;
+    delete process.env.NEXT_PUBLIC_SUPABASE_TEST_URL;
     process.env.STRIPE_WEBHOOK_SECRET = secret;
     process.env.STRIPE_SECRET_KEY = 'sk_test_placeholder';
     process.env.STRIPE_PAYMENT_LINK_ID = 'plink_landed';
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'service_role_placeholder';
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://example.supabase.co';
     upsert.mockResolvedValue({ error: null });
+  });
+
+  it('uses only test credentials for a Preview webhook', async () => {
+    process.env.VERCEL_ENV = 'preview';
+    process.env.STRIPE_WEBHOOK_SECRET = 'wrong-live-secret';
+    process.env.STRIPE_TEST_WEBHOOK_SECRET = secret;
+    process.env.STRIPE_TEST_SECRET_KEY = 'sk_test_placeholder';
+    process.env.STRIPE_TEST_PAYMENT_LINK_ID = 'plink_landed';
+    process.env.SUPABASE_TEST_SECRET_KEY = 'test-service-key';
+    process.env.NEXT_PUBLIC_SUPABASE_TEST_URL = 'https://test.supabase.co';
+
+    const response = await POST(signedRequest(eventPayload()));
+
+    expect(response.status).toBe(200);
+    expect(upsert).toHaveBeenCalledOnce();
   });
 
   it('rejects an invalid Stripe signature', async () => {

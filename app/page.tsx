@@ -2,8 +2,12 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import HomeMiniIntake from '@/app/components/HomeMiniIntake';
 import TrackedCheckoutLink from '@/app/components/TrackedCheckoutLink';
+import { resolveCheckoutUrl } from '@/lib/billing/checkoutUrl';
 
-const STRIPE_URL = 'https://buy.stripe.com/00wbITdDtgag2rV9Ez5gc02';
+const STRIPE_URL = resolveCheckoutUrl(
+  process.env.VERCEL_ENV,
+  process.env.STRIPE_TEST_CHECKOUT_URL,
+);
 
 export const metadata: Metadata = {
   alternates: {

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
+import { getSupabaseUrl } from '../../../../lib/supabase/config';
 
 export const runtime = 'nodejs';
 
@@ -12,11 +13,20 @@ function paymentLinkId(
 }
 
 export async function POST(request: Request) {
+  const isPreview = process.env.VERCEL_ENV === 'preview';
   const signature = request.headers.get('stripe-signature');
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  const stripeSecret = process.env.STRIPE_SECRET_KEY;
-  const expectedPaymentLink = process.env.STRIPE_PAYMENT_LINK_ID;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const webhookSecret = isPreview
+    ? process.env.STRIPE_TEST_WEBHOOK_SECRET
+    : process.env.STRIPE_WEBHOOK_SECRET;
+  const stripeSecret = isPreview
+    ? process.env.STRIPE_TEST_SECRET_KEY
+    : process.env.STRIPE_SECRET_KEY;
+  const expectedPaymentLink = isPreview
+    ? process.env.STRIPE_TEST_PAYMENT_LINK_ID
+    : process.env.STRIPE_PAYMENT_LINK_ID;
+  const serviceRoleKey = isPreview
+    ? process.env.SUPABASE_TEST_SECRET_KEY
+    : process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!signature || !webhookSecret || !stripeSecret || !expectedPaymentLink || !serviceRoleKey) {
     return NextResponse.json({ error: 'Webhook is not configured' }, { status: 500 });
@@ -53,7 +63,7 @@ export async function POST(request: Request) {
   }
 
   const admin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    getSupabaseUrl(),
     serviceRoleKey,
     { auth: { persistSession: false, autoRefreshToken: false } },
   );

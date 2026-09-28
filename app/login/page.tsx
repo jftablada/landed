@@ -10,14 +10,15 @@ import {
   type LoginArrivalState,
 } from '@/lib/auth/activation';
 import OnboardingProgress from '@/app/components/OnboardingProgress';
+import { getSupabaseAnonKey, getSupabaseUrl } from '@/lib/supabase/config';
 
 export default function LoginPage() {
   const router = useRouter();
 
   const [supabase] = useState(() =>
     createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      getSupabaseUrl(),
+      getSupabaseAnonKey(),
     ),
   );
 

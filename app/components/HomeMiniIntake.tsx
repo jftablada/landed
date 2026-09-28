@@ -118,7 +118,7 @@ const PROVINCES = Object.entries(PROVINCE_RESOURCES) as Array<
 >;
 
 interface HomeMiniIntakeProps {
-  checkoutUrl: string;
+  checkoutUrl: string | null;
 }
 
 export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
@@ -507,13 +507,19 @@ export default function HomeMiniIntake({ checkoutUrl }: HomeMiniIntakeProps) {
                     )}
                   </div>
 
-                  <a
-                    href={checkoutUrl}
-                    onClick={() => trackEvent('begin_checkout')}
-                    className="mt-5 inline-flex rounded-lg bg-brand px-6 py-3 text-sm font-semibold text-black transition-opacity hover:opacity-90"
-                  >
-                    Build my full 90-day roadmap
-                  </a>
+                  {checkoutUrl ? (
+                    <a
+                      href={checkoutUrl}
+                      onClick={() => trackEvent('begin_checkout')}
+                      className="mt-5 inline-flex rounded-lg bg-brand px-6 py-3 text-sm font-semibold text-black transition-opacity hover:opacity-90"
+                    >
+                      Build my full 90-day roadmap
+                    </a>
+                  ) : (
+                    <p className="mt-5 text-sm text-muted">
+                      Test checkout is being configured.
+                    </p>
+                  )}
                   <p className="mt-3 text-xs text-muted">
                     $5 CAD · one-time founding customer price · no subscription
                   </p>

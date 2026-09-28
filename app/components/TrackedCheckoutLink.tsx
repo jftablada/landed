@@ -8,10 +8,18 @@ export default function TrackedCheckoutLink({
   className,
   children,
 }: {
-  href: string;
+  href: string | null;
   className: string;
   children: ReactNode;
 }) {
+  if (!href) {
+    return (
+      <p className="mt-8 text-sm text-muted">
+        Test checkout is being configured.
+      </p>
+    );
+  }
+
   return (
     <a
       href={href}
