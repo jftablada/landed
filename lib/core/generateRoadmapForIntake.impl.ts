@@ -25,6 +25,7 @@ import {
 } from './computeMode';
 import { buildAdaptivePayload } from './buildAdaptivePayload';
 import { buildRunwayView, formatRunway } from './runwayDisplay';
+import { situationAcknowledgment } from './situationAcknowledgment';
 import type {
   GenerateOptions,
   GenerateResult,
@@ -101,6 +102,8 @@ export interface CheckInInsert {
 export interface DbClient {
   // 3a — intake by id, scoped to user. null if missing/not owned.
   getIntake(intakeId: string, userId: string): Promise<IntakeRow | null>;
+  // Journey context is captured once, separately from immutable intakes.
+  getJourneySituationType(journeyId: string, userId: string): Promise<string | null>;
   // 3b — existing roadmap for this intake (idempotency). null if none.
   getRoadmapByIntake(intakeId: string, userId: string): Promise<RoadmapRow | null>;
   // 3d — most recent prior roadmap in the journey (for check_in linkage).
@@ -263,6 +266,16 @@ export async function generateRoadmapForIntake(
     return { status: 'ai_failed', intakeId, journeyId };
   }
 
+  // A first roadmap can acknowledge what the user reported without changing
+  // the generated advice or repeating a potentially stale starting situation
+  // on later check-ins.
+  const situationLine =
+    !prior && intake.source === 'intake'
+      ? situationAcknowledgment(
+          await deps.db.getJourneySituationType(journeyId, userId),
+        )
+      : undefined;
+
   const newMode = okMode.mode;
   const elapsedDays = prior
     ? Math.max(
@@ -289,6 +302,7 @@ export async function generateRoadmapForIntake(
   const finalOutput = {
     ...applyServerRules(aiOutput, okMode, intake),
     runway: runwayPayload,
+    ...(situationLine ? { situation_acknowledgment: situationLine } : {}),
     ...(adaptivePayload ? { adaptive: adaptivePayload } : {}),
   };
 

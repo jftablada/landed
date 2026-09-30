@@ -36,6 +36,7 @@ export interface RoadmapPhase {
 export interface RoadmapOutput {
   runway?: RunwayPayload;
   adaptive?: AdaptivePayload;
+  situation_acknowledgment?: string;
   acknowledgment_line: string;
   pressure_points: string[];
   next_move: {

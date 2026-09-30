@@ -30,6 +30,7 @@ interface RoadmapOutput {
     runway_weeks: number | null;
   };
   adaptive?: AdaptivePayload;
+  situation_acknowledgment?: string;
   acknowledgment_line: string;
   pressure_points: string[];
   next_move: {
@@ -152,6 +153,11 @@ export default async function RoadmapPage({
       <p className="mt-14 text-muted text-sm uppercase tracking-widest mb-2">
         Your plan
       </p>
+      {output?.situation_acknowledgment && (
+        <p className="mb-3 text-sm leading-relaxed text-muted">
+          {output.situation_acknowledgment}
+        </p>
+      )}
       {output?.acknowledgment_line && (
         <h1 className="font-display text-4xl leading-[1.15] mb-8 w-full">
           {acknowledgmentParts ? (
