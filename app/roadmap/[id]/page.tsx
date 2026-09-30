@@ -12,6 +12,7 @@ import AuthenticatedNav from '@/app/components/AuthenticatedNav';
 import DisclosureSection from '@/app/components/DisclosureSection';
 import WeeklyTasksClient from './WeeklyTasksClient';
 import ExploreRunway from './ExploreRunway';
+import { selectHighlightedMove } from './selectHighlightedMove';
 import type { AdaptivePayload } from '@/lib/core/generateRoadmapForIntake';
 import {
   getAuthedUserId,
@@ -138,6 +139,10 @@ export default async function RoadmapPage({
   const acknowledgmentParts = output?.acknowledgment_line.match(
     /^(.*?)\s*(\(until around [^)]+\))\.\s*(.+)$/,
   );
+  const highlightedMove = selectHighlightedMove(
+    output?.next_move,
+    output?.adaptive,
+  );
 
   return (
     <main className="mx-auto w-full max-w-3xl px-5 py-10 sm:py-12">
@@ -161,12 +166,12 @@ export default async function RoadmapPage({
         </h1>
       )}
 
-      {output?.next_move && (
+      {highlightedMove && (
         <section className="mb-10 rounded-2xl bg-surface p-7 shadow-[0_22px_70px_rgba(0,0,0,0.24)] sm:p-9">
           <p className="text-xs uppercase tracking-[0.18em] text-brand">Your next move</p>
-          <h2 className="mt-3 text-3xl leading-snug text-text">{output.next_move.action}</h2>
-          <p className="mt-4 max-w-2xl leading-relaxed text-muted">{output.next_move.why_first}</p>
-          {output.next_move.boundary_note ? <p className="mt-3 text-sm italic text-muted">{output.next_move.boundary_note}</p> : null}
+          <h2 className="mt-3 text-3xl leading-snug text-text">{highlightedMove.action}</h2>
+          <p className="mt-4 max-w-2xl leading-relaxed text-muted">{highlightedMove.why_first}</p>
+          {highlightedMove.boundary_note ? <p className="mt-3 text-sm italic text-muted">{highlightedMove.boundary_note}</p> : null}
           <a href="#weekly-tasks-heading" className="mt-7 inline-block rounded-xl bg-brand px-6 py-3.5 font-semibold text-black hover:opacity-90">Open this week’s actions</a>
         </section>
       )}
