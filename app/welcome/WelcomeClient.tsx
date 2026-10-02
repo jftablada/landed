@@ -14,18 +14,18 @@ export default function WelcomeClient() {
     <main className="mx-auto w-full max-w-lg px-5 py-12 sm:py-20">
       <OnboardingProgress
         currentStep={2}
-        detail="Your payment is complete. Next, create the private account where your roadmap will live."
+        detail="After checkout, create the private account where your roadmap will live."
       />
 
       <p className="text-sm uppercase tracking-widest text-brand">
-        Payment received
+        Your next step
       </p>
       <h1 className="mt-3 font-display text-5xl leading-tight text-text">
         Welcome to Landed.
       </h1>
       <p className="mt-4 text-lg leading-relaxed text-muted">
-        Your next step is to create your Landed account. It usually takes about
-        two minutes.
+        If you just completed checkout, create your Landed account using the
+        same email. It usually takes about two minutes.
       </p>
 
       <section className="mt-8 rounded-2xl border border-hair bg-surface p-6 sm:p-8">
