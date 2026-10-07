@@ -2,8 +2,9 @@
 
 // app/intake/page.tsx — STYLED to the Landed design system.
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { createBrowserClient } from '@supabase/ssr';
 import LogoutButton from '@/app/components/LogoutButton';
 import { trackEvent } from '@/lib/analytics';
 import OnboardingProgress from '@/app/components/OnboardingProgress';
@@ -17,6 +18,7 @@ import {
   SITUATION_LABELS,
   type SituationType,
 } from '@/lib/core/freeStartingPoint';
+import { readProfileAnswers } from '@/lib/profile/profileSetup';
 
 type ProvinceCode =
   | 'AB'
@@ -140,6 +142,7 @@ const PROVINCES = Object.entries(PROVINCE_RESOURCES) as Array<
 
 export default function IntakePage() {
   const router = useRouter();
+  const profileFieldsTouched = useRef({ province: false, workType: false });
 
   const [step, setStep] = useState<IntakeStep>('start');
   const [situationType, setSituationType] = useState<SituationType | ''>('');
@@ -162,6 +165,25 @@ export default function IntakePage() {
 
   const taxUnsure = taxStatus === 'unsure';
   const selectedProvince = province ? PROVINCE_RESOURCES[province] : null;
+
+  useEffect(() => {
+    let mounted = true;
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    );
+    void supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!mounted || !user) return;
+      const profile = readProfileAnswers(user.user_metadata);
+      if (profile.province && !profileFieldsTouched.current.province) {
+        setProvince(profile.province);
+      }
+      if (profile.workType && !profileFieldsTouched.current.workType) {
+        setEmploymentType(profile.workType);
+      }
+    });
+    return () => { mounted = false; };
+  }, []);
 
   function showResources() {
     if (!situationType || !province || !employmentType) {
@@ -349,6 +371,7 @@ export default function IntakePage() {
                 className={fieldCls}
                 value={province}
                 onChange={(e) => {
+                  profileFieldsTouched.current.province = true;
                   setProvince(e.target.value as ProvinceCode);
                   setError(null);
                 }}
@@ -368,6 +391,7 @@ export default function IntakePage() {
                 className={fieldCls}
                 value={employmentType}
                 onChange={(e) => {
+                  profileFieldsTouched.current.workType = true;
                   setEmploymentType(e.target.value);
                   setError(null);
                 }}

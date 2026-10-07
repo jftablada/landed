@@ -10,6 +10,7 @@ export default function AuthenticatedNav({ roadmapId }: { roadmapId?: string }) 
         {roadmapId ? <Link href={`/roadmap/${roadmapId}`} className="transition-colors hover:text-text">Your plan</Link> : null}
         <Link href="/start#progress" className="transition-colors hover:text-text">Progress</Link>
         <a href="mailto:hello@getlanded.ca" className="transition-colors hover:text-text">Support</a>
+        <Link href="/profile" className="transition-colors hover:text-text">Profile</Link>
         <LogoutButton />
       </nav>
     </header>

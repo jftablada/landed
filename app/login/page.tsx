@@ -47,6 +47,7 @@ export default function LoginPage() {
       password,
       options: {
         emailRedirectTo: buildConfirmationRedirect(window.location.origin),
+        data: { profile_setup_status: 'pending' },
       },
     });
     setBusy(false);
@@ -57,8 +58,8 @@ export default function LoginPage() {
     }
     trackEvent('account_created');
     if (data.session) {
-      setStatus('Account created. Taking you to your plan…');
-      router.push('/start');
+      setStatus('Account created. Taking you to your profile setup…');
+      router.push('/profile/setup');
       return;
     }
 
@@ -99,7 +100,7 @@ export default function LoginPage() {
   async function signIn() {
     setBusy(true);
     setStatus(null);
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
     });
@@ -123,8 +124,9 @@ export default function LoginPage() {
             ? 'checkout'
             : 'standard',
     });
-    setStatus('Welcome back. Taking you to your plan…');
-    router.push('/start');
+    const needsProfileSetup = data.user?.user_metadata?.profile_setup_status === 'pending';
+    setStatus(needsProfileSetup ? 'Taking you to your profile setup…' : 'Welcome back. Taking you to your plan…');
+    router.push(needsProfileSetup ? '/profile/setup' : '/start');
   }
 
   const fieldCls =
