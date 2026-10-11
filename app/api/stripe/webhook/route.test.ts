@@ -110,4 +110,18 @@ describe('Stripe entitlement webhook', () => {
       { onConflict: 'stripe_checkout_session_id', ignoreDuplicates: true },
     );
   });
+
+  it('logs only a sanitized database error code when the entitlement write fails', async () => {
+    const logger = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      upsert.mockResolvedValue({ error: { code: '42501', message: 'buyer@example.com' } });
+      const response = await POST(signedRequest(eventPayload()));
+      expect(response.status).toBe(500);
+      expect(await response.json()).toEqual({ error: 'Could not record purchase' });
+      expect(logger).toHaveBeenCalledWith('purchase_entitlement_upsert_failed', { code: '42501' });
+      expect(JSON.stringify(logger.mock.calls)).not.toContain('buyer@example.com');
+    } finally {
+      logger.mockRestore();
+    }
+  });
 });

@@ -81,6 +81,9 @@ export async function POST(request: Request) {
   );
 
   if (error) {
+    // Log only a database error code, never buyer details, payloads, or secrets.
+    const code = /^[A-Z0-9]{2,10}$/.test(error.code ?? '') ? error.code : 'unknown';
+    console.error('purchase_entitlement_upsert_failed', { code });
     return NextResponse.json({ error: 'Could not record purchase' }, { status: 500 });
   }
   return NextResponse.json({ received: true });
