@@ -16,13 +16,10 @@ const fieldClass = 'w-full rounded-lg border border-hair bg-surface-2 px-4 py-3 
 export default function ProfileDetailsForm({
   initialAnswers,
   setup = false,
-  requireAll = false,
 }: {
   initialAnswers: ProfileAnswers;
   setup?: boolean;
-  requireAll?: boolean;
 }) {
-  const fieldsRequired = setup || requireAll;
   const router = useRouter();
   const [supabase] = useState(() =>
     createBrowserClient(
@@ -39,16 +36,10 @@ export default function ProfileDetailsForm({
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const displayName = name.trim().replace(/\s+/g, ' ');
-    if (displayName.length > 80) {
-      setStatus('Please use 80 characters or fewer for your name.');
+    const validationError = validateRequiredProfile({ displayName, province, workType });
+    if (validationError) {
+      setStatus(validationError);
       return;
-    }
-    if (fieldsRequired) {
-      const validationError = validateRequiredProfile({ displayName, province, workType });
-      if (validationError) {
-        setStatus(validationError);
-        return;
-      }
     }
 
     setBusy(true);
@@ -58,7 +49,7 @@ export default function ProfileDetailsForm({
         display_name: displayName,
         profile_province: province,
         profile_employment_type: workType,
-        ...(setup ? { profile_setup_status: 'complete' } : {}),
+        profile_setup_status: 'complete',
       },
     });
     setBusy(false);
@@ -81,14 +72,14 @@ export default function ProfileDetailsForm({
     <form onSubmit={save} className="space-y-5">
       <div>
         <label htmlFor="profile-name" className="mb-2 block text-sm text-muted">
-          What should we call you? {fieldsRequired ? null : <span className="text-xs">(optional)</span>}
+          What should we call you?
         </label>
         <input
           id="profile-name"
           type="text"
           autoComplete="name"
           maxLength={80}
-          required={fieldsRequired}
+          required
           disabled={busy}
           value={name}
           onChange={(event) => setName(event.target.value)}
@@ -98,12 +89,12 @@ export default function ProfileDetailsForm({
       </div>
       <div>
         <label htmlFor="profile-province" className="mb-2 block text-sm text-muted">
-          Province or territory {fieldsRequired ? null : <span className="text-xs">(optional)</span>}
+          Province or territory
         </label>
         <select
           id="profile-province"
           value={province}
-          required={fieldsRequired}
+          required
           disabled={busy}
           onChange={(event) => setProvince(event.target.value as ProfileAnswers['province'])}
           className={fieldClass}
@@ -116,12 +107,12 @@ export default function ProfileDetailsForm({
       </div>
       <div>
         <label htmlFor="profile-work-type" className="mb-2 block text-sm text-muted">
-          Work type {fieldsRequired ? null : <span className="text-xs">(optional)</span>}
+          Work type
         </label>
         <select
           id="profile-work-type"
           value={workType}
-          required={fieldsRequired}
+          required
           disabled={busy}
           onChange={(event) => setWorkType(event.target.value as ProfileWorkType | '')}
           className={fieldClass}

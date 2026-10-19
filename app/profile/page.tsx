@@ -78,10 +78,7 @@ export default async function ProfilePage() {
             About you
           </h2>
           <div className="mt-6">
-            <ProfileDetailsForm
-              initialAnswers={profileAnswers}
-              requireAll={user.user_metadata?.profile_setup_status === 'complete'}
-            />
+            <ProfileDetailsForm initialAnswers={profileAnswers} />
           </div>
           <dl className="mt-6 divide-y divide-hair/70">
             <div className="py-4 first:pt-0 sm:flex sm:justify-between sm:gap-8">
