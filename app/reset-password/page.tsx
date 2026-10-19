@@ -71,15 +71,21 @@ export default function ResetPasswordPage() {
 
     setBusy(true);
     const { error } = await supabase.auth.updateUser({ password });
-    setBusy(false);
 
     if (error) {
+      setBusy(false);
       setStatus(`We couldn’t update your password: ${error.message}`);
       return;
     }
 
-    setStatus('Password updated. Taking you to your plan…');
-    router.push('/start');
+    const { error: signOutError } = await supabase.auth.signOut({ scope: 'local' });
+    setBusy(false);
+    if (signOutError) {
+      setStatus('Your password was updated, but we couldn’t sign you out. Sign out before testing the new password.');
+      return;
+    }
+
+    router.replace('/login?password_reset=1');
   }
 
   const fieldCls =

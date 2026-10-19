@@ -7,7 +7,13 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function POST(req: Request) {
   const supabase = await createSupabaseServerClient();
-  await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    return NextResponse.json(
+      { error: 'Could not sign out. Please try again.' },
+      { status: 500 },
+    );
+  }
   // Redirect back to login after sign-out.
   return NextResponse.redirect(new URL('/login', req.url), { status: 303 });
 }

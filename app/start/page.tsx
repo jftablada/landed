@@ -15,6 +15,7 @@ import { deriveWeeklyTasks } from '@/lib/core/deriveWeeklyTasks';
 import type { RoadmapOutput } from '@/lib/core/generateRoadmapForIntake';
 import { hasPendingInitialRoadmap } from '@/lib/core/pendingInitialRoadmap';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { needsProfileSetup } from '@/lib/profile/profileSetup';
 
 const MODE_LABEL: Record<string, string> = {
   critical: 'Stabilize first',
@@ -49,6 +50,7 @@ export default async function StartPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
+  if (needsProfileSetup(user.user_metadata)) redirect('/profile/setup');
 
   const userId = user.id;
   const hasAccess = await hasLandedAccess(supabase);
@@ -303,11 +305,11 @@ export default async function StartPage() {
       ) : (
         <>
           <section className="mt-8">
-            <div className="rounded-2xl bg-surface p-7 shadow-[0_22px_70px_rgba(0,0,0,0.24)] sm:p-10">
+            <div className="rounded-2xl bg-surface p-6 shadow-[0_22px_70px_rgba(0,0,0,0.24)] sm:p-10">
               <p className="text-sm uppercase tracking-widest text-brand">
                 Your next move
               </p>
-              <h2 className="mt-4 max-w-3xl text-3xl leading-snug text-text sm:text-4xl">
+              <h2 className="mt-4 max-w-3xl text-2xl leading-snug text-text sm:text-4xl">
                 {nextTask?.label ??
                   output?.next_move?.action ??
                   'Review your roadmap and choose one useful action.'}
@@ -332,16 +334,6 @@ export default async function StartPage() {
               >
                 {weeklyTasks.length ? 'Open this week’s tasks' : 'Open my roadmap'}
               </Link>
-            </div>
-          </section>
-
-          <section className="mt-6 rounded-2xl bg-surface px-6 py-5" aria-label="This week's progress">
-            <div className="flex items-center justify-between gap-4 text-sm">
-              <span className="font-medium text-text">This week</span>
-              <span className="text-muted">{completedCount} of {weeklyTasks.length} complete</span>
-            </div>
-            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface-2">
-              <div className="h-full rounded-full bg-brand" style={{ width: `${completionPercent}%` }} />
             </div>
           </section>
 

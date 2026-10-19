@@ -11,6 +11,7 @@ import {
 } from '@/lib/auth/activation';
 import OnboardingProgress from '@/app/components/OnboardingProgress';
 import { getSupabaseAnonKey, getSupabaseUrl } from '@/lib/supabase/config';
+import { needsProfileSetup } from '@/lib/profile/profileSetup';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,6 +40,7 @@ export default function LoginPage() {
 
   const arrivedFromCheckout = arrivalState === 'checkout';
   const emailConfirmed = arrivalState === 'confirmed';
+  const passwordReset = arrivalState === 'password_reset';
 
   async function signUp() {
     setBusy(true);
@@ -48,6 +50,7 @@ export default function LoginPage() {
       password,
       options: {
         emailRedirectTo: buildConfirmationRedirect(window.location.origin),
+        data: { profile_setup_status: 'pending' },
       },
     });
     setBusy(false);
@@ -58,8 +61,8 @@ export default function LoginPage() {
     }
     trackEvent('account_created');
     if (data.session) {
-      setStatus('Account created. Taking you to your plan…');
-      router.push('/start');
+      setStatus('Account created. Taking you to your profile setup…');
+      router.push('/profile/setup');
       return;
     }
 
@@ -100,7 +103,7 @@ export default function LoginPage() {
   async function signIn() {
     setBusy(true);
     setStatus(null);
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
     });
@@ -122,10 +125,13 @@ export default function LoginPage() {
           ? 'confirmation_return'
           : arrivalState === 'checkout'
             ? 'checkout'
+            : arrivalState === 'password_reset'
+              ? 'password_reset'
             : 'standard',
     });
-    setStatus('Welcome back. Taking you to your plan…');
-    router.push('/start');
+    const needsSetup = needsProfileSetup(data.user?.user_metadata);
+    setStatus(needsSetup ? 'Taking you to your profile setup…' : 'Welcome back. Taking you to your plan…');
+    router.push(needsSetup ? '/profile/setup' : '/start');
   }
 
   const fieldCls =
@@ -146,14 +152,18 @@ export default function LoginPage() {
       )}
       <p className="text-muted text-sm uppercase tracking-widest mb-2">Landed</p>
       <h1 className="font-display text-4xl leading-tight mb-2 max-w-xs text-balance">
-        {emailConfirmed
+        {passwordReset
+          ? 'Password updated. Sign in again.'
+          : emailConfirmed
           ? 'Email confirmed. Sign in to continue.'
           : arrivedFromCheckout
             ? 'Payment received. Let’s get you started.'
             : 'You just got the call. Now what?'}
       </h1>
       <p className="text-muted mb-10">
-        {emailConfirmed
+        {passwordReset
+          ? 'Use the new password you just chose. This confirms your account works after the reset session ends.'
+          : emailConfirmed
           ? 'Use the email and password you chose when creating your account.'
           : arrivedFromCheckout
             ? 'Create your Landed account below using the email address from checkout.'

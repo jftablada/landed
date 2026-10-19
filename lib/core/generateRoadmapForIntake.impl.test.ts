@@ -60,6 +60,7 @@ function fakeDb(opts: {
   intake: IntakeRow | null;
   existingRoadmap?: RoadmapRow | null;
   priorRoadmap?: RoadmapRow | null;
+  situationType?: string | null;
 }): DbClient & { inserts: { roadmap: RoadmapInsert; checkIn: CheckInInsert }[] } {
   const inserts: { roadmap: RoadmapInsert; checkIn: CheckInInsert }[] = [];
   return {
@@ -68,6 +69,9 @@ function fakeDb(opts: {
       if (!opts.intake) return null;
       if (opts.intake.id !== id || opts.intake.user_id !== userId) return null;
       return opts.intake;
+    },
+    async getJourneySituationType() {
+      return opts.situationType ?? null;
     },
     async getRoadmapByIntake() {
       return opts.existingRoadmap ?? null;
@@ -176,6 +180,21 @@ describe('blocked path (tax unsure)', () => {
 
 // ─────────────────────────────────────────────────────────────────────
 describe('happy path', () => {
+  it('stores a neutral situation acknowledgment on the first roadmap only', async () => {
+    const db = fakeDb({ intake: baseIntake(), situationType: 'dismissed' });
+
+    await generateRoadmapForIntake(
+      { intakeId: 'intake-1', userId: 'user-1' },
+      deps(db, fakeAi([GOOD_AI_JSON])),
+    );
+
+    expect(db.inserts[0].roadmap.output_json).toMatchObject({
+      situation_acknowledgment: 'You told us you were dismissed or fired.',
+      acknowledgment_line: 'You have some room to plan.',
+      next_move: { action: 'Define your target roles.' },
+    });
+  });
+
   it('computes mode, calls AI once, inserts roadmap + check_in', async () => {
     const db = fakeDb({ intake: baseIntake() }); // 11000/3000 ≈ 15.9 wk → strategic
     const ai = fakeAi([GOOD_AI_JSON]);
@@ -201,7 +220,12 @@ describe('happy path', () => {
       runway_date: '2026-06-30', net_monthly_gap: 3000, display_state: 'normal',
       blocked: false, block_reason: null, output_json: null,
     };
-    const db = fakeDb({ intake: baseIntake(), priorRoadmap: prior });
+    const db = fakeDb({
+      intake: baseIntake(),
+      priorRoadmap: prior,
+      situationType: 'dismissed',
+    });
+    const situationRead = vi.spyOn(db, 'getJourneySituationType');
     const res = await generateRoadmapForIntake({ intakeId: 'intake-1', userId: 'user-1' }, deps(db, fakeAi([GOOD_AI_JSON])));
     if (res.status === 'ok') {
       expect(res.checkIn.previous_mode).toBe('survival');
@@ -210,6 +234,8 @@ describe('happy path', () => {
     } else {
       throw new Error('expected ok');
     }
+    expect(situationRead).not.toHaveBeenCalled();
+    expect(db.inserts[0].roadmap.output_json).not.toHaveProperty('situation_acknowledgment');
   });
 
   it('persists adaptive output using activity and prior-roadmap age', async () => {

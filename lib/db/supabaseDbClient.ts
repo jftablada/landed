@@ -77,6 +77,21 @@ export function createSupabaseDbClient(
       return (data as IntakeRow) ?? null;
     },
 
+    async getJourneySituationType(
+      journeyId: string,
+      uid: string,
+    ): Promise<string | null> {
+      assertSameUser(uid, userId);
+      const { data, error } = await supabase
+        .from('journeys')
+        .select('situation_type')
+        .eq('id', journeyId)
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (error) throw normalize(error);
+      return data?.situation_type ?? null;
+    },
+
     // ── 3b: existing roadmap for the intake (idempotency read) ────────
     async getRoadmapByIntake(
       intakeId: string,

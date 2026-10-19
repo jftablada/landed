@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Bebas_Neue, DM_Sans } from "next/font/google";
 import GoogleAnalytics from "@/app/components/GoogleAnalytics";
 import AnalyticsPageViews from "@/app/components/AnalyticsPageViews";
+import TestEnvironmentBanner from "@/app/components/TestEnvironmentBanner";
 import "./globals.css";
 
 // Bebas Neue — display font for strong headings. Only one weight exists.
@@ -61,6 +62,7 @@ export default function RootLayout({
       className={`${dmSans.variable} ${bebasNeue.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <TestEnvironmentBanner />
         {children}
         <GoogleAnalytics />
         <AnalyticsPageViews />
