@@ -6,7 +6,7 @@ import AuthenticatedNav from '@/app/components/AuthenticatedNav';
 import { hasLandedAccess } from '@/lib/billing/entitlement';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import ProfileDetailsForm from './ProfileDetailsForm';
-import { readProfileAnswers } from '@/lib/profile/profileSetup';
+import { needsProfileSetup, readProfileAnswers } from '@/lib/profile/profileSetup';
 
 export const metadata: Metadata = {
   title: 'Your profile',
@@ -20,6 +20,7 @@ export default async function ProfilePage() {
     error: authError,
   } = await supabase.auth.getUser();
   if (authError || !user) redirect('/login');
+  if (needsProfileSetup(user.user_metadata)) redirect('/profile/setup');
 
   const [hasAccess, { data: journey, error: journeyError }] = await Promise.all([
     hasLandedAccess(supabase),
@@ -77,7 +78,10 @@ export default async function ProfilePage() {
             About you
           </h2>
           <div className="mt-6">
-            <ProfileDetailsForm initialAnswers={profileAnswers} />
+            <ProfileDetailsForm
+              initialAnswers={profileAnswers}
+              requireAll={user.user_metadata?.profile_setup_status === 'complete'}
+            />
           </div>
           <dl className="mt-6 divide-y divide-hair/70">
             <div className="py-4 first:pt-0 sm:flex sm:justify-between sm:gap-8">

@@ -8,6 +8,7 @@ import {
   PROFILE_WORK_TYPES,
   type ProfileAnswers,
   type ProfileWorkType,
+  validateRequiredProfile,
 } from '@/lib/profile/profileSetup';
 
 const fieldClass = 'w-full rounded-lg border border-hair bg-surface-2 px-4 py-3 text-text focus:border-brand focus:outline-none';
@@ -15,10 +16,13 @@ const fieldClass = 'w-full rounded-lg border border-hair bg-surface-2 px-4 py-3 
 export default function ProfileDetailsForm({
   initialAnswers,
   setup = false,
+  requireAll = false,
 }: {
   initialAnswers: ProfileAnswers;
   setup?: boolean;
+  requireAll?: boolean;
 }) {
+  const fieldsRequired = setup || requireAll;
   const router = useRouter();
   const [supabase] = useState(() =>
     createBrowserClient(
@@ -39,6 +43,13 @@ export default function ProfileDetailsForm({
       setStatus('Please use 80 characters or fewer for your name.');
       return;
     }
+    if (fieldsRequired) {
+      const validationError = validateRequiredProfile({ displayName, province, workType });
+      if (validationError) {
+        setStatus(validationError);
+        return;
+      }
+    }
 
     setBusy(true);
     setStatus(null);
@@ -58,6 +69,7 @@ export default function ProfileDetailsForm({
     }
     if (setup) {
       router.replace('/start');
+      router.refresh();
     } else {
       setName(displayName);
       setStatus('Profile saved.');
@@ -65,31 +77,19 @@ export default function ProfileDetailsForm({
     }
   }
 
-  async function skip() {
-    setBusy(true);
-    setStatus(null);
-    const { error } = await supabase.auth.updateUser({
-      data: { profile_setup_status: 'skipped' },
-    });
-    setBusy(false);
-    if (error) {
-      setStatus('We couldn’t continue. Please try again.');
-      return;
-    }
-    router.replace('/start');
-  }
-
   return (
     <form onSubmit={save} className="space-y-5">
       <div>
         <label htmlFor="profile-name" className="mb-2 block text-sm text-muted">
-          What should we call you? <span className="text-xs">(optional)</span>
+          What should we call you? {fieldsRequired ? null : <span className="text-xs">(optional)</span>}
         </label>
         <input
           id="profile-name"
           type="text"
           autoComplete="name"
           maxLength={80}
+          required={fieldsRequired}
+          disabled={busy}
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Your preferred name"
@@ -98,11 +98,13 @@ export default function ProfileDetailsForm({
       </div>
       <div>
         <label htmlFor="profile-province" className="mb-2 block text-sm text-muted">
-          Province or territory <span className="text-xs">(optional)</span>
+          Province or territory {fieldsRequired ? null : <span className="text-xs">(optional)</span>}
         </label>
         <select
           id="profile-province"
           value={province}
+          required={fieldsRequired}
+          disabled={busy}
           onChange={(event) => setProvince(event.target.value as ProfileAnswers['province'])}
           className={fieldClass}
         >
@@ -114,11 +116,13 @@ export default function ProfileDetailsForm({
       </div>
       <div>
         <label htmlFor="profile-work-type" className="mb-2 block text-sm text-muted">
-          Work type <span className="text-xs">(optional)</span>
+          Work type {fieldsRequired ? null : <span className="text-xs">(optional)</span>}
         </label>
         <select
           id="profile-work-type"
           value={workType}
+          required={fieldsRequired}
+          disabled={busy}
           onChange={(event) => setWorkType(event.target.value as ProfileWorkType | '')}
           className={fieldClass}
         >
@@ -141,16 +145,6 @@ export default function ProfileDetailsForm({
         >
           {busy ? 'Saving…' : setup ? 'Save and continue' : 'Save profile'}
         </button>
-        {setup ? (
-          <button
-            type="button"
-            onClick={skip}
-            disabled={busy}
-            className="text-sm text-muted underline underline-offset-4 hover:text-text disabled:opacity-50"
-          >
-            Skip for now
-          </button>
-        ) : null}
       </div>
       {status ? <p className="text-sm text-muted" role="status">{status}</p> : null}
     </form>

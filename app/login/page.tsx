@@ -10,6 +10,7 @@ import {
   type LoginArrivalState,
 } from '@/lib/auth/activation';
 import OnboardingProgress from '@/app/components/OnboardingProgress';
+import { needsProfileSetup } from '@/lib/profile/profileSetup';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -127,9 +128,9 @@ export default function LoginPage() {
               ? 'password_reset'
             : 'standard',
     });
-    const needsProfileSetup = data.user?.user_metadata?.profile_setup_status === 'pending';
-    setStatus(needsProfileSetup ? 'Taking you to your profile setup…' : 'Welcome back. Taking you to your plan…');
-    router.push(needsProfileSetup ? '/profile/setup' : '/start');
+    const needsSetup = needsProfileSetup(data.user?.user_metadata);
+    setStatus(needsSetup ? 'Taking you to your profile setup…' : 'Welcome back. Taking you to your plan…');
+    router.push(needsSetup ? '/profile/setup' : '/start');
   }
 
   const fieldCls =

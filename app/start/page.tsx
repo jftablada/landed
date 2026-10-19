@@ -15,6 +15,7 @@ import { deriveWeeklyTasks } from '@/lib/core/deriveWeeklyTasks';
 import type { RoadmapOutput } from '@/lib/core/generateRoadmapForIntake';
 import { hasPendingInitialRoadmap } from '@/lib/core/pendingInitialRoadmap';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { needsProfileSetup } from '@/lib/profile/profileSetup';
 
 const MODE_LABEL: Record<string, string> = {
   critical: 'Stabilize first',
@@ -49,6 +50,7 @@ export default async function StartPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
+  if (needsProfileSetup(user.user_metadata)) redirect('/profile/setup');
 
   const userId = user.id;
   const hasAccess = await hasLandedAccess(supabase);
