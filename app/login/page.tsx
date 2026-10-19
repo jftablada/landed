@@ -38,6 +38,7 @@ export default function LoginPage() {
 
   const arrivedFromCheckout = arrivalState === 'checkout';
   const emailConfirmed = arrivalState === 'confirmed';
+  const passwordReset = arrivalState === 'password_reset';
 
   async function signUp() {
     setBusy(true);
@@ -122,6 +123,8 @@ export default function LoginPage() {
           ? 'confirmation_return'
           : arrivalState === 'checkout'
             ? 'checkout'
+            : arrivalState === 'password_reset'
+              ? 'password_reset'
             : 'standard',
     });
     const needsProfileSetup = data.user?.user_metadata?.profile_setup_status === 'pending';
@@ -147,14 +150,18 @@ export default function LoginPage() {
       )}
       <p className="text-muted text-sm uppercase tracking-widest mb-2">Landed</p>
       <h1 className="font-display text-4xl leading-tight mb-2 max-w-xs text-balance">
-        {emailConfirmed
+        {passwordReset
+          ? 'Password updated. Sign in again.'
+          : emailConfirmed
           ? 'Email confirmed. Sign in to continue.'
           : arrivedFromCheckout
             ? 'Payment received. Let’s get you started.'
             : 'You just got the call. Now what?'}
       </h1>
       <p className="text-muted mb-10">
-        {emailConfirmed
+        {passwordReset
+          ? 'Use the new password you just chose. This confirms your account works after the reset session ends.'
+          : emailConfirmed
           ? 'Use the email and password you chose when creating your account.'
           : arrivedFromCheckout
             ? 'Create your Landed account below using the email address from checkout.'

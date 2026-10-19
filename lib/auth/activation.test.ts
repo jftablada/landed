@@ -19,6 +19,10 @@ describe('account activation flow', () => {
     expect(getLoginArrivalState('?next=/start')).toBe('standard');
   });
 
+  it('recognizes the post-reset sign-in handoff', () => {
+    expect(getLoginArrivalState('?password_reset=1')).toBe('password_reset');
+  });
+
   it('builds a stable confirmation return URL', () => {
     expect(buildConfirmationRedirect('https://www.getlanded.ca/')).toBe(
       'https://www.getlanded.ca/login?confirmed=1',
