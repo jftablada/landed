@@ -9,6 +9,7 @@ import {
 import AuthenticatedNav from '@/app/components/AuthenticatedNav';
 import DisclosureSection from '@/app/components/DisclosureSection';
 import ResumeInitialRoadmap from '@/app/components/ResumeInitialRoadmap';
+import WeeklyTasksClient from '@/app/components/WeeklyTasksClient';
 import { hasLandedAccess } from '@/lib/billing/entitlement';
 import { resolveStartAccessState } from '@/lib/billing/startAccess';
 import { deriveWeeklyTasks } from '@/lib/core/deriveWeeklyTasks';
@@ -217,10 +218,10 @@ export default async function StartPage() {
   const output = parseOutput(roadmap.output_json);
   const weeklyTasks =
     !roadmap.blocked && output ? deriveWeeklyTasks(output) : [];
-  const [{ data: progress }, { data: checkIns }] = await Promise.all([
+  const [{ data: progress, error: progressError }, { data: checkIns }] = await Promise.all([
     supabase
       .from('roadmap_task_progress')
-      .select('task_key, completed')
+      .select('task_key, completed, completed_at')
       .eq('roadmap_id', roadmap.id)
       .eq('user_id', userId),
     supabase
@@ -238,18 +239,12 @@ export default async function StartPage() {
     (checkIn) => checkIn.new_roadmap_id === roadmap.id,
   );
 
-  const completedKeys = new Set(
-    (progress ?? [])
-      .filter((item) => item.completed)
-      .map((item) => item.task_key),
-  );
-  const nextTask = weeklyTasks.find((task) => !completedKeys.has(task.key));
-  const completedCount = weeklyTasks.filter((task) =>
-    completedKeys.has(task.key),
-  ).length;
-  const completionPercent = weeklyTasks.length
-    ? Math.round((completedCount / weeklyTasks.length) * 100)
-    : 0;
+  const progressByKey = new Map((progress ?? []).map((item) => [item.task_key, item]));
+  const initialTasks = progressError ? undefined : weeklyTasks.map((task) => ({
+    ...task,
+    completed: progressByKey.get(task.key)?.completed ?? false,
+    completed_at: progressByKey.get(task.key)?.completed_at ?? null,
+  }));
   const hasActivity =
     latestCheckIn?.applications_submitted != null ||
     latestCheckIn?.employer_responses != null ||
@@ -304,38 +299,13 @@ export default async function StartPage() {
         </section>
       ) : (
         <>
-          <section className="mt-8">
-            <div className="rounded-2xl bg-surface p-6 shadow-[0_22px_70px_rgba(0,0,0,0.24)] sm:p-10">
-              <p className="text-sm uppercase tracking-widest text-brand">
-                Your next move
-              </p>
-              <h2 className="mt-4 max-w-3xl text-2xl leading-snug text-text sm:text-4xl">
-                {nextTask?.label ??
-                  output?.next_move?.action ??
-                  'Review your roadmap and choose one useful action.'}
-              </h2>
-              {weeklyTasks.length > 0 ? (
-                <div className="mt-7">
-                  <div className="mb-2 flex justify-between text-sm text-muted">
-                    <span>This week</span>
-                    <span>{completedCount} of {weeklyTasks.length} done</span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-surface-2">
-                    <div
-                      className="h-full rounded-full bg-brand"
-                      style={{ width: `${completionPercent}%` }}
-                    />
-                  </div>
-                </div>
-              ) : null}
-              <Link
-                href={`/roadmap/${roadmap.id}#weekly-tasks-heading`}
-                className="mt-8 inline-block rounded-xl bg-brand px-6 py-3.5 font-semibold text-black hover:opacity-90"
-              >
-                {weeklyTasks.length ? 'Open this week’s tasks' : 'Open my roadmap'}
-              </Link>
-            </div>
-          </section>
+          <WeeklyTasksClient
+            key={roadmap.id}
+            roadmapId={roadmap.id}
+            initialTasks={initialTasks}
+            variant="today"
+            fallbackAction={output?.next_move?.action}
+          />
 
           <div className="mt-10 space-y-4">
           <DisclosureSection eyebrow="Your context" title="Financial runway" summary="Your current room to move, kept out of the way until you need it.">
