@@ -4,9 +4,11 @@ export interface WeeklyTaskGuidance {
   steps: readonly string[];
   starter?: { label: string; text: string };
   finishLine: string;
+  workspace?: 'companies';
 }
 
 const companyList: WeeklyTaskGuidance = {
+  workspace: 'companies',
   topic: 'A shortlist with a reason',
   introduction:
     'Start with places you would want to explore, not a wall of open tabs.',

@@ -4,7 +4,7 @@ import WeeklyTaskGuide from './WeeklyTaskGuide';
 import { getWeeklyTaskGuidance } from '../../lib/core/weeklyTaskGuidance';
 
 describe('expanded action guide', () => {
-  it('shows a practical path, an optional starter, and a finish line', () => {
+  it('opens the company workspace without competing copy actions', () => {
     const html = renderToStaticMarkup(
       <WeeklyTaskGuide
         guide={getWeeklyTaskGuidance('Build a 10-company target list')}
@@ -12,9 +12,10 @@ describe('expanded action guide', () => {
     );
     expect(html).toContain('A shortlist with a reason');
     expect(html.match(/<li /g)).toHaveLength(3);
-    expect(html).toContain('Copy starter');
+    expect(html).toContain('Open company workspace');
+    expect(html).toContain('href="/companies"');
     expect(html).toContain('A useful finish line');
-    expect(html).toContain('Organization | Why it interests me');
+    expect(html).not.toContain('Copy starter');
     expect(html).not.toContain('<form');
   });
 
