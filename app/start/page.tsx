@@ -308,6 +308,11 @@ export default async function StartPage() {
           />
 
           <div className="mt-10 space-y-4">
+          <Link href="/companies" className="block rounded-2xl bg-surface p-6 transition-colors hover:bg-surface-2 sm:p-8">
+            <h2 className="font-display text-2xl text-text">Your target companies</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted">Keep your shortlist, reasons, and next steps together.</p>
+            <span className="mt-4 inline-block text-sm text-brand">Open your workspace →</span>
+          </Link>
           <DisclosureSection eyebrow="Your context" title="Financial runway" summary="Your current room to move, kept out of the way until you need it.">
             <div>
               <p className="text-sm uppercase tracking-widest text-muted">

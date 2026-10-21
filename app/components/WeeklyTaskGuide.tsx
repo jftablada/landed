@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import type { WeeklyTaskGuidance } from '../../lib/core/weeklyTaskGuidance';
 
 export default function WeeklyTaskGuide({
@@ -41,7 +42,15 @@ export default function WeeklyTaskGuide({
           </li>
         ))}
       </ol>
-      {guide.starter ? (
+      {guide.workspace === 'companies' ? (
+        <Link
+          href="/companies"
+          className="mt-6 inline-block rounded-lg bg-brand px-5 py-3 font-medium text-black"
+        >
+          Open company workspace →
+        </Link>
+      ) : null}
+      {guide.starter && !guide.workspace ? (
         <div className="mt-6 border-l-2 border-brand/40 pl-4">
           <p className="text-xs uppercase tracking-wider text-muted">
             {guide.starter.label}
