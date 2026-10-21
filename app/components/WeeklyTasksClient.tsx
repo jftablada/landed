@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 
 import type { WeeklyTask } from '@/lib/core/deriveWeeklyTasks';
+import { getWeeklyTaskGuidance } from '../../lib/core/weeklyTaskGuidance';
+import WeeklyTaskGuide from './WeeklyTaskGuide';
 
 export interface WeeklyTaskProgress extends WeeklyTask {
   completed: boolean;
@@ -28,6 +30,7 @@ export default function WeeklyTasksClient({
   const pendingRef = useRef(new Set<string>());
   const [error, setError] = useState<string | null>(null);
   const [loadAttempt, setLoadAttempt] = useState(0);
+  const [expandedTaskKey, setExpandedTaskKey] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialTasks !== undefined) return;
@@ -247,33 +250,67 @@ export default function WeeklyTasksClient({
           >
             {tasks.map((task) => {
               const pending = pendingKeys.has(task.key);
+              const expanded = expandedTaskKey === task.key;
+              const guideId = `${variant}-${roadmapId}-${task.key}-guide`;
+              const triggerId = `${guideId}-trigger`;
 
               return (
-                <label
+                <div
                   key={task.key}
-                  className={`flex items-start gap-4 py-5 transition-colors ${variant === 'today' ? 'rounded-lg px-2 -mx-2' : 'px-5'} ${
-                    pending
-                      ? 'opacity-60'
-                      : 'cursor-pointer hover:bg-surface-2/50'
-                  }`}
+                  className={variant === 'today' ? 'px-2 -mx-2' : 'px-5'}
                 >
-                  <input
-                    type="checkbox"
-                    checked={task.completed}
-                    disabled={pending}
-                    onChange={() => toggleTask(task)}
-                    className="mt-1 h-5 w-5 shrink-0 accent-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
-                  />
-                  <span
-                    className={
-                      task.completed
-                        ? 'text-muted line-through'
-                        : 'text-text leading-relaxed'
-                    }
+                  <div className="flex items-start gap-4">
+                    <input
+                      type="checkbox"
+                      aria-label={task.label}
+                      checked={task.completed}
+                      disabled={pending}
+                      onChange={() => toggleTask(task)}
+                      className="mt-6 h-5 w-5 shrink-0 accent-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand disabled:opacity-60"
+                    />
+                    <button
+                      type="button"
+                      id={triggerId}
+                      aria-expanded={expanded}
+                      aria-controls={guideId}
+                      onClick={() =>
+                        setExpandedTaskKey(expanded ? null : task.key)
+                      }
+                      className="group flex min-w-0 flex-1 items-start justify-between gap-4 rounded-lg py-5 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
+                    >
+                      <span className="min-w-0">
+                        <span
+                          className={`block leading-relaxed ${task.completed ? 'text-muted line-through' : 'text-text'}`}
+                        >
+                          {task.label}
+                        </span>
+                        <span className="mt-1.5 block text-xs text-muted transition-colors group-hover:text-brand">
+                          {expanded ? 'Close guide' : 'How to do this'}
+                        </span>
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className={`mt-0.5 shrink-0 text-lg leading-none ${expanded ? 'text-brand' : 'text-muted group-hover:text-brand'}`}
+                      >
+                        {expanded ? '−' : '+'}
+                      </span>
+                    </button>
+                  </div>
+                  <div
+                    id={guideId}
+                    role="region"
+                    aria-labelledby={triggerId}
+                    hidden={!expanded}
+                    className="sm:ml-9"
                   >
-                    {task.label}
-                  </span>
-                </label>
+                    {expanded ? (
+                      <WeeklyTaskGuide
+                        key={task.key}
+                        guide={getWeeklyTaskGuidance(task.label)}
+                      />
+                    ) : null}
+                  </div>
+                </div>
               );
             })}
           </div>
