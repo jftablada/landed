@@ -4,14 +4,40 @@ import CompanyWorkspace from './CompanyWorkspace';
 
 describe('company workspace presentation', () => {
   it('starts with one company and does not require optional profile details', () => {
-    const html = renderToStaticMarkup(<CompanyWorkspace initialCompanies={[]} />);
+    const html = renderToStaticMarkup(
+      <CompanyWorkspace initialCompanies={[]} />,
+    );
     expect(html).toContain('Start with one company.');
     expect(html).toContain('Save company');
     expect(html).toContain('Why it interests you');
     expect(html.match(/required=""/g)).toHaveLength(1);
+    expect(html).toContain('aria-busy="false"');
+    expect(html).toContain('autoComplete="off"');
+  });
+  it('gives each field an explicit, unique label association', () => {
+    const html = renderToStaticMarkup(<CompanyWorkspace initialCompanies={[]} />);
+    const labels = [...html.matchAll(/<label for="([^"]+)"/g)].map((match) => match[1]);
+    expect(labels).toHaveLength(4);
+    expect(new Set(labels).size).toBe(4);
+    for (const id of labels) expect(html).toContain(`id="${id}"`);
+    expect(html).toMatch(/>Next step<\/label><select/);
   });
   it('shows saved context and a single edit action without an open form', () => {
-    const html = renderToStaticMarkup(<CompanyWorkspace initialCompanies={[{ id: 'test', company_name: '<Example>', target_role: 'Designer', why_fit: 'Meaningful work', next_step: 'contact', created_at: '', updated_at: '' }]} />);
+    const html = renderToStaticMarkup(
+      <CompanyWorkspace
+        initialCompanies={[
+          {
+            id: 'test',
+            company_name: '<Example>',
+            target_role: 'Designer',
+            why_fit: 'Meaningful work',
+            next_step: 'contact',
+            created_at: '',
+            updated_at: '',
+          },
+        ]}
+      />,
+    );
     expect(html).toContain('&lt;Example&gt;');
     expect(html).toContain('Designer');
     expect(html).toContain('Meaningful work');

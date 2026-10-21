@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useId, useState, type FormEvent } from 'react';
 import {
   NEXT_STEPS,
   type CompanyInput,
@@ -11,11 +11,16 @@ function CompanyForm({
   company,
   onSaved,
   onCancel,
+  onStateChange,
+  navigationNotice,
 }: {
   company?: TargetCompany;
   onSaved: (company: TargetCompany) => void;
   onCancel?: () => void;
+  onStateChange: (state: 'clean' | 'dirty' | 'saving') => void;
+  navigationNotice: string;
 }) {
+  const formId = useId();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const inputClass =
@@ -24,6 +29,7 @@ function CompanyForm({
     event.preventDefault();
     if (busy) return;
     setBusy(true);
+    onStateChange('saving');
     setError('');
     const form = new FormData(event.currentTarget);
     const fields: CompanyInput = {
@@ -41,13 +47,14 @@ function CompanyForm({
           ...(company ? { id: company.id } : {}),
         }),
       });
-      const result = await response.json();
-      if (!response.ok || !result.company)
+      const result = await response.json().catch(() => null);
+      if (!response.ok || !result?.company)
         throw new Error(
-          result.message || 'Your changes weren’t saved. Please try again.',
+          result?.message || 'Your changes weren’t saved. Please try again.',
         );
       onSaved(result.company);
     } catch (reason) {
+      onStateChange('dirty');
       setError(
         reason instanceof Error
           ? reason.message
@@ -58,76 +65,104 @@ function CompanyForm({
     }
   }
   return (
-    <form onSubmit={submit} className="space-y-5">
-      <label className="block text-sm text-muted">
-        Company name <span className="text-text">(required)</span>
-        <input
-          name="company_name"
-          required
-          maxLength={120}
-          defaultValue={company?.company_name}
-          className={inputClass}
-          autoComplete="organization"
-        />
-      </label>
-      <label className="block text-sm text-muted">
-        Why it interests you <span>(optional)</span>
-        <textarea
-          name="why_fit"
-          maxLength={600}
-          rows={3}
-          defaultValue={company?.why_fit}
-          placeholder="A team, problem, or kind of work that appeals to you."
-          className={inputClass}
-        />
-      </label>
-      <label className="block text-sm text-muted">
-        Target role <span>(optional)</span>
-        <input
-          name="target_role"
-          maxLength={120}
-          defaultValue={company?.target_role}
-          placeholder="The role you would explore"
-          className={inputClass}
-        />
-      </label>
-      <label className="block text-sm text-muted">
-        Next step
-        <select
-          name="next_step"
-          defaultValue={company?.next_step ?? 'research'}
-          className={inputClass}
-        >
-          {Object.entries(NEXT_STEPS).map(([key, label]) => (
-            <option key={key} value={key}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </label>
-      {error ? (
-        <p role="alert" className="text-sm leading-relaxed text-text">
-          {error}
-        </p>
-      ) : null}
-      <div className="flex flex-wrap items-center gap-5">
-        <button
-          disabled={busy}
-          className="min-h-12 rounded-lg bg-brand px-6 py-3 font-medium text-black transition-opacity hover:opacity-90 disabled:opacity-50"
-        >
-          {busy ? 'Saving…' : company ? 'Save changes' : 'Save company'}
-        </button>
-        {onCancel ? (
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={busy}
-            className="min-h-12 text-sm text-muted hover:text-text"
+    <form
+      onSubmit={submit}
+      onChange={() => {
+        if (!busy) onStateChange('dirty');
+      }}
+      aria-busy={busy}
+    >
+      <fieldset disabled={busy} className="space-y-5 disabled:opacity-70">
+        <div className="text-sm text-muted">
+          <label htmlFor={`${formId}-name`} className="block">
+            Company name <span className="text-text">(required)</span>
+          </label>
+          <input
+            id={`${formId}-name`}
+            name="company_name"
+            required
+            maxLength={120}
+            defaultValue={company?.company_name}
+            className={inputClass}
+            autoComplete="off"
+          />
+        </div>
+        <div className="text-sm text-muted">
+          <label htmlFor={`${formId}-reason`} className="block">
+            Why it interests you <span>(optional)</span>
+          </label>
+          <textarea
+            id={`${formId}-reason`}
+            name="why_fit"
+            maxLength={600}
+            rows={3}
+            defaultValue={company?.why_fit}
+            placeholder="A team, problem, or kind of work that appeals to you."
+            className={inputClass}
+          />
+        </div>
+        <div className="text-sm text-muted">
+          <label htmlFor={`${formId}-role`} className="block">
+            Target role <span>(optional)</span>
+          </label>
+          <input
+            id={`${formId}-role`}
+            name="target_role"
+            maxLength={120}
+            defaultValue={company?.target_role}
+            placeholder="The role you would explore"
+            className={inputClass}
+          />
+        </div>
+        <div className="text-sm text-muted">
+          <label htmlFor={`${formId}-step`} className="block">
+            Next step
+          </label>
+          <select
+            id={`${formId}-step`}
+            name="next_step"
+            defaultValue={company?.next_step ?? 'research'}
+            className={inputClass}
           >
-            Cancel
-          </button>
+            {Object.entries(NEXT_STEPS).map(([key, label]) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+        {navigationNotice ? (
+          <p
+            role="alert"
+            className="rounded-lg bg-brand/10 p-4 text-sm leading-relaxed text-text"
+          >
+            {navigationNotice}
+          </p>
         ) : null}
-      </div>
+        {error ? (
+          <p role="alert" className="text-sm leading-relaxed text-text">
+            {error}
+          </p>
+        ) : null}
+        <div className="flex flex-wrap items-center gap-5">
+          <button
+            disabled={busy}
+            className="min-h-12 rounded-lg bg-brand px-6 py-3 font-medium text-black transition-opacity hover:opacity-90 disabled:opacity-50"
+          >
+            {busy ? 'Saving…' : company ? 'Save changes' : 'Save company'}
+          </button>
+          {onCancel ? (
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={busy}
+              className="min-h-12 text-sm text-muted hover:text-text"
+            >
+              Cancel
+            </button>
+          ) : null}
+        </div>
+      </fieldset>
     </form>
   );
 }
@@ -141,6 +176,30 @@ export default function CompanyWorkspace({
   const [adding, setAdding] = useState(initialCompanies.length === 0);
   const [editing, setEditing] = useState<string | null>(null);
   const [notice, setNotice] = useState('');
+  const [editorState, setEditorState] = useState<'clean' | 'dirty' | 'saving'>(
+    'clean',
+  );
+  const [navigationNotice, setNavigationNotice] = useState('');
+  function switchEditor(nextId: string | null, add: boolean) {
+    if (editorState !== 'clean') {
+      setNavigationNotice(
+        editorState === 'saving'
+          ? 'Your company is still saving. Please wait before switching.'
+          : 'Your notes aren’t saved yet. Save your changes or choose Cancel before switching.',
+      );
+      return;
+    }
+    setEditing(nextId);
+    setAdding(add);
+    setNotice('');
+    setNavigationNotice('');
+  }
+  function cancelEditor() {
+    setEditorState('clean');
+    setNavigationNotice('');
+    setEditing(null);
+    setAdding(false);
+  }
   function saved(company: TargetCompany) {
     setCompanies((previous) =>
       previous.some((item) => item.id === company.id)
@@ -150,6 +209,8 @@ export default function CompanyWorkspace({
     setAdding(false);
     setEditing(null);
     setNotice(`${company.company_name} saved.`);
+    setEditorState('clean');
+    setNavigationNotice('');
   }
   return (
     <div>
@@ -170,17 +231,16 @@ export default function CompanyWorkspace({
           </p>
           <CompanyForm
             onSaved={saved}
-            onCancel={companies.length ? () => setAdding(false) : undefined}
+            onCancel={companies.length ? cancelEditor : undefined}
+            onStateChange={setEditorState}
+            navigationNotice={navigationNotice}
           />
         </section>
       ) : (
         <button
-          onClick={() => {
-            setAdding(true);
-            setEditing(null);
-            setNotice('');
-          }}
-          className="mb-8 min-h-12 rounded-lg bg-brand px-6 py-3 font-medium text-black hover:opacity-90"
+          onClick={() => switchEditor(null, true)}
+          disabled={editorState === 'saving'}
+          className="mb-8 min-h-12 rounded-lg bg-brand px-6 py-3 font-medium text-black hover:opacity-90 disabled:opacity-50"
         >
           Add a company
         </button>
@@ -219,7 +279,9 @@ export default function CompanyWorkspace({
                     <CompanyForm
                       company={company}
                       onSaved={saved}
-                      onCancel={() => setEditing(null)}
+                      onCancel={cancelEditor}
+                      onStateChange={setEditorState}
+                      navigationNotice={navigationNotice}
                     />
                   </div>
                 ) : (
@@ -230,13 +292,10 @@ export default function CompanyWorkspace({
                       </p>
                     ) : null}
                     <button
-                      onClick={() => {
-                        setEditing(company.id);
-                        setAdding(false);
-                        setNotice('');
-                      }}
+                      onClick={() => switchEditor(company.id, false)}
+                      disabled={editorState === 'saving'}
                       aria-label={`Edit ${company.company_name}`}
-                      className="mt-5 min-h-11 text-sm text-brand hover:text-text"
+                      className="mt-5 min-h-11 text-sm text-brand hover:text-text disabled:opacity-50"
                     >
                       Edit details →
                     </button>
