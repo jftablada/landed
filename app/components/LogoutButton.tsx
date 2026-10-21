@@ -32,6 +32,7 @@ export default function LogoutButton() {
     <span className="inline-flex flex-col items-start gap-1">
       <button
         type="button"
+        data-leaves-page
         onClick={handleLogout}
         disabled={busy}
         className="text-muted text-sm hover:text-text disabled:cursor-wait disabled:opacity-50"

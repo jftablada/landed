@@ -1,6 +1,7 @@
 'use client';
 
-import { useId, useState, type FormEvent } from 'react';
+import { useEffect, useId, useState, type FormEvent } from 'react';
+import { protectUnsavedForm } from '../../lib/forms/unsavedFormGuard';
 import {
   NEXT_STEPS,
   type CompanyInput,
@@ -133,6 +134,8 @@ function CompanyForm({
         </div>
         {navigationNotice ? (
           <p
+            id="company-navigation-notice"
+            tabIndex={-1}
             role="alert"
             className="rounded-lg bg-brand/10 p-4 text-sm leading-relaxed text-text"
           >
@@ -180,6 +183,20 @@ export default function CompanyWorkspace({
     'clean',
   );
   const [navigationNotice, setNavigationNotice] = useState('');
+  useEffect(() => {
+    if (editorState === 'clean') return;
+    return protectUnsavedForm(() => {
+      setNavigationNotice(
+        editorState === 'saving'
+          ? 'Your company is still saving. Please wait before leaving.'
+          : 'Your notes aren’t saved yet. Save your changes or choose Cancel before leaving.',
+      );
+    });
+  }, [editorState]);
+  useEffect(() => {
+    if (navigationNotice)
+      document.getElementById('company-navigation-notice')?.focus();
+  }, [navigationNotice]);
   function switchEditor(nextId: string | null, add: boolean) {
     if (editorState !== 'clean') {
       setNavigationNotice(
