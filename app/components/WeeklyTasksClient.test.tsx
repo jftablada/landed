@@ -104,4 +104,23 @@ describe('weekly tasks on Today', () => {
     expect(html).not.toContain('Your next move');
     expect(html.match(/type="checkbox"/g)).toHaveLength(3);
   });
+
+  it('keeps guides collapsed and separate from the completion checkboxes', () => {
+    const html = renderToStaticMarkup(
+      <WeeklyTasksClient
+        roadmapId={roadmapId}
+        initialTasks={tasks}
+        variant="today"
+      />,
+    );
+    expect(html.match(/aria-expanded="false"/g)).toHaveLength(3);
+    expect(html.match(/How to do this/g)).toHaveLength(3);
+    expect(html.match(/role="region"/g)).toHaveLength(3);
+    expect(html).toContain(
+      `aria-controls="today-${roadmapId}-next_move-guide"`,
+    );
+    expect(html).not.toContain('A shortlist with a reason');
+    expect(html).not.toContain('Copy starter');
+    expect(html.match(/checked=""/g)).toHaveLength(1);
+  });
 });
