@@ -63,7 +63,10 @@ export default function CheckinClient() {
 
   useEffect(() => {
     if (!dirty && !submitting) return;
-    const cleanup = protectUnsavedForm(() => setNavigationNotice(true));
+    const cleanup = protectUnsavedForm(() => {
+      setError(null);
+      setNavigationNotice(true);
+    });
     releaseGuard.current = cleanup;
     return () => {
       cleanup();
