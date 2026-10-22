@@ -52,7 +52,7 @@ export async function GET(req: Request) {
     const { data: snapshot, error: snapErr } = await supabase
       .from('intakes')
       .select(
-        'province, confirmed_cash, essential_burn, debt_minimums, ei_status, ei_monthly_amount',
+        'province, confirmed_cash, essential_burn, debt_minimums, ei_status, ei_monthly_amount, created_at',
       )
       .eq('journey_id', journeyId)
       .eq('user_id', userId)
@@ -72,6 +72,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       journey_id: journeyId,
+      activity_since: snapshot.created_at,
       province: snapshot.province,
       confirmed_cash: snapshot.confirmed_cash,
       essential_burn: snapshot.essential_burn,
