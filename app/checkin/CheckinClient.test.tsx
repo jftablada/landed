@@ -206,12 +206,14 @@ describe('guided check-in interaction', () => {
   });
   it('blocks leaving dirty answers and allows an explicit discard', async () => {
     await loaded();
+    submit();
     completeSearch();
     render();
     harness.effects[0]();
     expect(harness.guard).toHaveBeenCalledOnce();
     harness.guard.mock.calls[0][0]();
     const alert = find(render(), (node) => node.props.id === 'checkin-message');
+    expect(find(alert, node => node.type === 'p').props.children).toBe('Your answers haven’t been submitted. Finish your check-in or discard your answers before leaving.');
     const discard = find(alert, (node) => node.type === 'button');
     (discard.props.onClick as () => void)();
     expect(harness.cleanup).toHaveBeenCalled();
